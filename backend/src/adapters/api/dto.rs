@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
+use validator::Validate;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct GenerateRecipeRequest {
+    #[validate(length(min = 1, message = "At least one ingredient is required"))]
     pub ingredients: Vec<String>,
     pub dietary_restrictions: Option<Vec<String>>,
 }
