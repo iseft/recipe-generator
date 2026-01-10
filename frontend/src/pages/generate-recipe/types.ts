@@ -1,11 +1,5 @@
 import { z } from "zod";
-
-function parseCommaSeparated(value: string): string[] {
-  return value
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
-}
+import { parseCommaSeparated } from "../../shared/utils/parseCommaSeparated";
 
 export const generateRecipeFormSchema = z.object({
   ingredients: z
