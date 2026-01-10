@@ -2,12 +2,13 @@ import { useGenerateRecipe } from "./hooks/useGenerateRecipe";
 import IngredientInput from "./components/IngredientInput";
 import RecipeCard from "./components/RecipeCard";
 import Spinner from "../../shared/components/Spinner";
+import type { GenerateRecipeRequest } from "./types";
 
 export default function GenerateRecipe() {
   const { mutate, data, isPending, error } = useGenerateRecipe();
 
-  const handleSubmit = (ingredients: string[]) => {
-    mutate({ ingredients });
+  const handleSubmit = (request: GenerateRecipeRequest) => {
+    mutate(request);
   };
 
   return (
