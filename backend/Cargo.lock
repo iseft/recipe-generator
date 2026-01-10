@@ -102,6 +102,7 @@ dependencies = [
  "serde_json",
  "tokio",
  "tokio-test",
+ "tower-http",
  "validator",
 ]
 

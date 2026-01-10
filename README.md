@@ -90,3 +90,4 @@ curl -X POST http://localhost:3000/api/recipe \
 |----------|-------------|----------|
 | `PORT` | Server port (default: 3000) | No |
 | `OPENAI_API_KEY` | OpenAI API key | Yes |
+| `CORS_ORIGIN` | Allowed CORS origin (default: http://localhost:5173) | No |
