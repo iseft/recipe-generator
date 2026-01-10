@@ -1,16 +1,29 @@
 import { z } from "zod";
 
+function parseCommaSeparated(value: string): string[] {
+  return value
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
 export const generateRecipeFormSchema = z.object({
-  ingredients: z.string().min(1, "At least one ingredient is required"),
-  dietaryRestrictions: z.string().optional(),
+  ingredients: z
+    .string()
+    .min(1, "At least one ingredient is required")
+    .transform(parseCommaSeparated)
+    .refine(
+      (arr) => arr.length > 0,
+      "At least one valid ingredient is required"
+    ),
+  dietaryRestrictions: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseCommaSeparated(val) : undefined)),
 });
 
-export type GenerateRecipeFormData = z.infer<typeof generateRecipeFormSchema>;
-
-export interface GenerateRecipeRequest {
-  ingredients: string[];
-  dietaryRestrictions?: string[];
-}
+export type GenerateRecipeFormData = z.input<typeof generateRecipeFormSchema>;
+export type GenerateRecipeRequest = z.output<typeof generateRecipeFormSchema>;
 
 export interface Recipe {
   title: string;

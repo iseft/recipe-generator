@@ -8,13 +8,6 @@ import {
   type GenerateRecipeRequest,
 } from "../types";
 
-function parseCommaSeparated(value: string): string[] {
-  return value
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
-}
-
 interface IngredientInputProps {
   onSubmit: (data: GenerateRecipeRequest) => void;
   isLoading?: boolean;
@@ -30,25 +23,13 @@ export default function IngredientInput({
     register,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm<GenerateRecipeFormData>({
+  } = useForm<GenerateRecipeFormData, unknown, GenerateRecipeRequest>({
     resolver: zodResolver(generateRecipeFormSchema),
     mode: "onChange",
   });
 
-  const onFormSubmit = (data: GenerateRecipeFormData) => {
-    const ingredients = parseCommaSeparated(data.ingredients);
-    if (ingredients.length === 0) return;
-
-    onSubmit({
-      ingredients,
-      dietaryRestrictions: data.dietaryRestrictions
-        ? parseCommaSeparated(data.dietaryRestrictions)
-        : undefined,
-    });
-  };
-
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <Input
         label="Ingredients"
         placeholder="chicken, rice, garlic, onion..."
