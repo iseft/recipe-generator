@@ -3,7 +3,7 @@ use serde::Serialize;
 use std::sync::Arc;
 
 use crate::application::use_cases::GenerateRecipeUseCase;
-use crate::domain::services::LlmService;
+use crate::domain::services::{LlmError, LlmService};
 
 use super::dto::{GenerateRecipeRequest, RecipeResponse};
 use super::extractors::ValidatedJson;
@@ -21,12 +21,17 @@ pub async fn generate_recipe<T: LlmService>(
         .execute(request.ingredients, request.dietary_restrictions)
         .await
         .map_err(|e| {
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(ErrorResponse {
-                    error: format!("{:?}", e),
-                }),
-            )
+            let (status, message) = match e {
+                LlmError::ApiError(_) => (
+                    StatusCode::BAD_GATEWAY,
+                    "Failed to reach AI service".to_string(),
+                ),
+                LlmError::ParseError(_) => (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to parse AI response".to_string(),
+                ),
+            };
+            (status, Json(ErrorResponse { error: message }))
         })?;
 
     Ok(Json(RecipeResponse {
