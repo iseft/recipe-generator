@@ -111,3 +111,44 @@ impl LlmService for OpenAiClient {
         serde_json::from_str(&content).map_err(|e| LlmError::ParseError(e.to_string()))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn build_prompt_includes_ingredients() {
+        let ingredients = vec!["chicken".to_string(), "rice".to_string()];
+        let prompt = OpenAiClient::build_prompt(&ingredients, &None);
+
+        assert!(prompt.contains("chicken, rice"));
+    }
+
+    #[test]
+    fn build_prompt_includes_dietary_restrictions() {
+        let ingredients = vec!["tofu".to_string()];
+        let restrictions = Some(vec!["vegan".to_string(), "gluten-free".to_string()]);
+        let prompt = OpenAiClient::build_prompt(&ingredients, &restrictions);
+
+        assert!(prompt.contains("Dietary restrictions: vegan, gluten-free"));
+    }
+
+    #[test]
+    fn build_prompt_omits_restrictions_when_none() {
+        let ingredients = vec!["beef".to_string()];
+        let prompt = OpenAiClient::build_prompt(&ingredients, &None);
+
+        assert!(!prompt.contains("Dietary restrictions"));
+    }
+
+    #[test]
+    fn build_prompt_requests_json_format() {
+        let ingredients = vec!["pasta".to_string()];
+        let prompt = OpenAiClient::build_prompt(&ingredients, &None);
+
+        assert!(prompt.contains("valid JSON"));
+        assert!(prompt.contains("\"title\""));
+        assert!(prompt.contains("\"ingredients\""));
+        assert!(prompt.contains("\"instructions\""));
+    }
+}
