@@ -18,6 +18,18 @@ impl OpenAiClient {
         }
     }
 
+    /// Builds the LLM prompt for recipe generation.
+    /// Prompt design choices:
+    /// 1. **JSON-only response**: We explicitly request "valid JSON only, no markdown" to ensure
+    ///    the response can be directly parsed by serde_json without stripping markdown code fences.
+    /// 2. **Exact schema provided**: Including the full JSON structure as an example ensures
+    ///    consistent field names and types across all responses, making parsing reliable.
+    /// 3. **Dietary restrictions inline**: Placed directly in the prompt context so the model
+    ///    considers them when selecting ingredients and cooking methods.
+    /// 4. **Ingredients as comma-separated list**: Simple format that's easy for the model to parse
+    ///    and doesn't introduce ambiguity.
+    /// 5. **Optional fields with example values**: Showing numeric examples (10, 20, 4) guides the
+    ///    model to return integers rather than strings like "10 minutes".
     fn build_prompt(ingredients: &[String], dietary_restrictions: &Option<Vec<String>>) -> String {
         let restrictions = dietary_restrictions
             .as_ref()
