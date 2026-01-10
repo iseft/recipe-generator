@@ -1,3 +1,4 @@
+mod application;
 mod domain;
 use axum::{Router, routing::get};
 use std::net::SocketAddr;
