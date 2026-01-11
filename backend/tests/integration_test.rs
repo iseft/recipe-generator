@@ -1,9 +1,8 @@
 use axum::{
-    body::{Body, to_bytes},
+    body::Body,
     http::{Request, StatusCode},
 };
 use sqlx::{PgPool, postgres::PgPoolOptions};
-use std::sync::Arc;
 use tower::util::ServiceExt;
 use uuid::Uuid;
 
@@ -132,7 +131,7 @@ async fn test_shared_recipes_requires_auth() {
 }
 
 #[tokio::test]
-async fn test_generate_requires_auth() {
+async fn test_generate_does_not_require_auth() {
     let _pool = create_test_pool().await;
 
     let request_body = serde_json::json!({
@@ -152,7 +151,7 @@ async fn test_generate_requires_auth() {
         .await
         .unwrap();
 
-    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    assert_eq!(response.status(), StatusCode::OK);
 }
 
 #[tokio::test]

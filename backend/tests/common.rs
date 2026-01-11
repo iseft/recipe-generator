@@ -6,6 +6,7 @@ use backend::application::use_cases::{
     CreateShareUseCase, DeleteShareUseCase, GenerateRecipeUseCase, GetRecipeUseCase,
     ListRecipesUseCase, SaveRecipeUseCase,
 };
+use backend::infrastructure::auth::init_clerk;
 use backend::infrastructure::db::create_pool;
 use backend::infrastructure::repositories::{PgRecipeRepository, PgRecipeShareRepository};
 use tower::ServiceBuilder;
@@ -53,6 +54,8 @@ pub async fn create_test_app() -> Router {
 pub async fn create_test_app_with_llm<T: backend::domain::services::LlmService + 'static>(
     llm_client: Arc<T>,
 ) -> Router {
+    init_clerk("sk_test_dummy_key_for_testing".to_string());
+
     let database_url = std::env::var("TEST_DATABASE_URL").unwrap_or_else(|_| {
         "postgres://recipe_user:recipe_password@localhost:5432/recipe_generator_test".to_string()
     });
