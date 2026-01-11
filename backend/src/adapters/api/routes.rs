@@ -26,7 +26,7 @@ pub fn create_router<
 >(
     generate_use_case: Arc<GenerateRecipeUseCase<T>>,
     save_use_case: Arc<SaveRecipeUseCase<R>>,
-    get_use_case: Arc<GetRecipeUseCase<R>>,
+    get_use_case: Arc<GetRecipeUseCase<R, S>>,
     list_owned_use_case: Arc<ListOwnedRecipesUseCase<R>>,
     list_shared_use_case: Arc<ListSharedRecipesUseCase<R>>,
     create_share_use_case: Arc<CreateShareUseCase<R, S>>,

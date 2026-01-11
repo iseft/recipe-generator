@@ -14,7 +14,7 @@ pub struct AppState<
 > {
     pub generate_use_case: Arc<GenerateRecipeUseCase<T>>,
     pub save_use_case: Arc<SaveRecipeUseCase<R>>,
-    pub get_use_case: Arc<GetRecipeUseCase<R>>,
+    pub get_use_case: Arc<GetRecipeUseCase<R, S>>,
     pub list_owned_use_case: Arc<ListOwnedRecipesUseCase<R>>,
     pub list_shared_use_case: Arc<ListSharedRecipesUseCase<R>>,
     pub create_share_use_case: Arc<CreateShareUseCase<R, S>>,

@@ -37,6 +37,38 @@ fn map_repo_error(e: RepositoryError) -> (StatusCode, Json<ErrorResponse>) {
     )
 }
 
+fn map_llm_error(e: LlmError) -> (StatusCode, Json<ErrorResponse>) {
+    let (status, user_message, log_message) = match &e {
+        LlmError::ApiError(msg) => (
+            StatusCode::BAD_GATEWAY,
+            "Failed to reach AI service. Please try again later.",
+            format!("AI API error: {}", msg),
+        ),
+        LlmError::ParseError(msg) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to process AI response. Please try again.",
+            format!("AI response parse error: {}", msg),
+        ),
+    };
+    eprintln!("Error: {}", log_message);
+    (
+        status,
+        Json(ErrorResponse {
+            error: user_message.to_string(),
+        }),
+    )
+}
+
+fn map_auth_lookup_error(e: String) -> (StatusCode, Json<ErrorResponse>) {
+    eprintln!("Failed to lookup user by email: {}", e);
+    (
+        StatusCode::INTERNAL_SERVER_ERROR,
+        Json(ErrorResponse {
+            error: "Failed to lookup user".to_string(),
+        }),
+    )
+}
+
 pub async fn generate_recipe<T: LlmService, R: RecipeRepository, S: RecipeShareRepository>(
     State(state): State<AppState<T, R, S>>,
     ValidatedJson(request): ValidatedJson<GenerateRecipeRequest>,
@@ -45,27 +77,7 @@ pub async fn generate_recipe<T: LlmService, R: RecipeRepository, S: RecipeShareR
         .generate_use_case
         .execute(request.ingredients, request.dietary_restrictions)
         .await
-        .map_err(|e| {
-            let (status, user_message, log_message) = match &e {
-                LlmError::ApiError(msg) => (
-                    StatusCode::BAD_GATEWAY,
-                    "Failed to reach AI service. Please try again later.",
-                    format!("AI API error: {}", msg),
-                ),
-                LlmError::ParseError(msg) => (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    "Failed to process AI response. Please try again.",
-                    format!("AI response parse error: {}", msg),
-                ),
-            };
-            eprintln!("Error: {}", log_message);
-            (
-                status,
-                Json(ErrorResponse {
-                    error: user_message.to_string(),
-                }),
-            )
-        })?;
+        .map_err(map_llm_error)?;
 
     Ok(Json(recipe.into()))
 }
@@ -153,26 +165,17 @@ pub async fn create_share<T: LlmService, R: RecipeRepository, S: RecipeShareRepo
     Path(recipe_id): Path<Uuid>,
     ValidatedJson(request): ValidatedJson<CreateShareRequest>,
 ) -> Result<StatusCode, (StatusCode, Json<ErrorResponse>)> {
-    let user_id = match crate::infrastructure::auth::get_user_id_by_email(&request.email).await {
-        Ok(Some(id)) => id,
-        Ok(None) => {
-            return Err((
+    let user_id = crate::infrastructure::auth::get_user_id_by_email(&request.email)
+        .await
+        .map_err(map_auth_lookup_error)?
+        .ok_or_else(|| {
+            (
                 StatusCode::NOT_FOUND,
                 Json(ErrorResponse {
                     error: "User with this email not found".to_string(),
                 }),
-            ));
-        }
-        Err(e) => {
-            eprintln!("Failed to lookup user by email: {}", e);
-            return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(ErrorResponse {
-                    error: "Failed to lookup user".to_string(),
-                }),
-            ));
-        }
-    };
+            )
+        })?;
 
     state
         .create_share_use_case

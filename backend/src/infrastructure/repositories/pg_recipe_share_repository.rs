@@ -47,4 +47,21 @@ impl RecipeShareRepository for PgRecipeShareRepository {
 
         Ok(())
     }
+
+    async fn is_shared_with_user(
+        &self,
+        recipe_id: Uuid,
+        user_id: &str,
+    ) -> Result<bool, RepositoryError> {
+        let result: Option<(bool,)> = sqlx::query_as(
+            "SELECT EXISTS(SELECT 1 FROM recipe_shares WHERE recipe_id = $1 AND user_id = $2)",
+        )
+        .bind(recipe_id)
+        .bind(user_id)
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(|e| RepositoryError::DatabaseError(e.to_string()))?;
+
+        Ok(result.map(|(exists,)| exists).unwrap_or(false))
+    }
 }

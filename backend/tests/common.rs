@@ -66,7 +66,10 @@ pub async fn create_test_app_with_llm<T: backend::domain::services::LlmService +
 
     let generate_use_case = Arc::new(GenerateRecipeUseCase::new(llm_client));
     let save_use_case = Arc::new(SaveRecipeUseCase::new(recipe_repository.clone()));
-    let get_use_case = Arc::new(GetRecipeUseCase::new(recipe_repository.clone()));
+    let get_use_case = Arc::new(GetRecipeUseCase::new(
+        recipe_repository.clone(),
+        share_repository.clone(),
+    ));
     let list_owned_use_case = Arc::new(ListOwnedRecipesUseCase::new(recipe_repository.clone()));
     let list_shared_use_case = Arc::new(ListSharedRecipesUseCase::new(recipe_repository.clone()));
     let create_share_use_case = Arc::new(CreateShareUseCase::new(

@@ -49,23 +49,6 @@ impl RecipeRepository for PgRecipeRepository {
         .ok_or(RepositoryError::NotFound)
     }
 
-    async fn find_by_id_with_access(&self, id: Uuid, user_id: &str) -> Result<Recipe, RepositoryError> {
-        sqlx::query_as::<_, Recipe>(
-            r#"
-            SELECT r.id, r.owner_id, r.title, r.ingredients, r.instructions, r.prep_time_minutes, r.cook_time_minutes, r.servings, r.created_at
-            FROM recipes r
-            LEFT JOIN recipe_shares rs ON r.id = rs.recipe_id AND rs.user_id = $2
-            WHERE r.id = $1 AND (r.owner_id = $2 OR rs.user_id IS NOT NULL)
-            "#,
-        )
-        .bind(id)
-        .bind(user_id)
-        .fetch_optional(&self.pool)
-        .await
-        .map_err(|e| RepositoryError::DatabaseError(e.to_string()))?
-        .ok_or(RepositoryError::NotFound)
-    }
-
     async fn find_by_owner(&self, owner_id: &str) -> Result<Vec<Recipe>, RepositoryError> {
         sqlx::query_as::<_, Recipe>(
             "SELECT id, owner_id, title, ingredients, instructions, prep_time_minutes, cook_time_minutes, servings, created_at FROM recipes WHERE owner_id = $1 ORDER BY created_at DESC",
