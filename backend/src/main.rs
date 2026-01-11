@@ -18,7 +18,9 @@ use tower_http::cors::{Any, CorsLayer};
 
 #[tokio::main]
 async fn main() {
-    dotenvy::dotenv().ok();
+    dotenvy::from_filename("../.env")
+        .or_else(|_| dotenvy::dotenv())
+        .ok();
 
     let config = AppConfig::from_env();
 

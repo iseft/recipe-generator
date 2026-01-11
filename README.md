@@ -57,8 +57,26 @@ docker compose down -v
 
 - Rust 1.75+ (`rustup update`)
 - Node.js 20+ (use `nvm use`)
-- PostgreSQL 16+ (or use Docker: `docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=recipe_password -e POSTGRES_USER=recipe_user -e POSTGRES_DB=recipe_generator postgres:16-alpine`)
+- PostgreSQL 16+ (or use Docker - see below)
 - OpenAI API key
+
+### Local Database Setup
+
+Run the setup script to create the PostgreSQL container and databases:
+```bash
+./create-local-db.sh
+```
+
+This script will:
+- Create and start a PostgreSQL container named `recipe-postgres` (if it doesn't exist)
+- Create the main database `recipe_generator` (for development)
+- Create the test database `recipe_generator_test` (for integration tests)
+
+The container uses:
+- User: `recipe_user`
+- Password: `recipe_password`
+- Port: `5432`
+- Connection: `postgres://recipe_user:recipe_password@localhost:5432/recipe_generator`
 
 ### Setup
 
@@ -93,6 +111,12 @@ npm run dev:frontend  # Frontend only
 
 ### Run Tests
 
+Before running tests, ensure the test database exists:
+```bash
+./create-local-db.sh  # Creates both main and test databases
+```
+
+Then run tests:
 ```bash
 cd backend
 cargo test
