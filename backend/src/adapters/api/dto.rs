@@ -75,3 +75,30 @@ impl From<Recipe> for RecipeResponse {
         }
     }
 }
+
+#[derive(Debug, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct SaveRecipeRequest {
+    #[validate(length(min = 1))]
+    pub title: String,
+    #[validate(custom(function = "validate_ingredients"))]
+    pub ingredients: Vec<String>,
+    #[validate(length(min = 1))]
+    pub instructions: Vec<String>,
+    pub prep_time_minutes: Option<i32>,
+    pub cook_time_minutes: Option<i32>,
+    pub servings: Option<i32>,
+}
+
+impl From<SaveRecipeRequest> for GeneratedRecipe {
+    fn from(request: SaveRecipeRequest) -> Self {
+        Self {
+            title: request.title,
+            ingredients: request.ingredients,
+            instructions: request.instructions,
+            prep_time_minutes: request.prep_time_minutes,
+            cook_time_minutes: request.cook_time_minutes,
+            servings: request.servings,
+        }
+    }
+}
