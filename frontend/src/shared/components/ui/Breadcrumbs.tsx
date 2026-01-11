@@ -15,7 +15,7 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
   return (
     <nav aria-label="Breadcrumb" className="flex">
       <ol role="list" className="flex items-center space-x-4">
-        <li>
+        <li key="home">
           <div>
             <Link
               to="/"
@@ -26,8 +26,8 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
             </Link>
           </div>
         </li>
-        {items.map((item) => (
-          <li key={item.name}>
+        {items.map((item, index) => (
+          <li key={`${item.href}-${index}`}>
             <div className="flex items-center">
               <ChevronRightIcon
                 aria-hidden="true"

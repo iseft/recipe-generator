@@ -4,7 +4,6 @@ import IngredientInput from "./IngredientInput";
 import RecipeCard from "../../../shared/components/recipe/RecipeCard";
 import PrimaryButton from "../../../shared/components/ui/PrimaryButton";
 import LoadingState from "../../../shared/components/ui/LoadingState";
-import Breadcrumbs from "../../../shared/components/ui/Breadcrumbs";
 import type { GenerateRecipeRequest } from "../types";
 
 export default function GenerateRecipeContent() {
@@ -27,9 +26,6 @@ export default function GenerateRecipeContent() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs
-        items={[{ name: "Recipe Generator", href: "/", current: true }]}
-      />
       <IngredientInput
         onSubmit={handleSubmit}
         isLoading={isPending}

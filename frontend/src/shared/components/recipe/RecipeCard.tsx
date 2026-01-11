@@ -1,19 +1,36 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import CardWithHeader from "../ui/CardWithHeader";
 import type { Recipe } from "../../../pages/generate-recipe/types";
 
 interface RecipeCardProps {
   recipe: Recipe;
+  basePath?: string;
 }
 
-export default function RecipeCard({ recipe }: RecipeCardProps) {
+export default function RecipeCard({ recipe, basePath }: RecipeCardProps) {
+  console.log("recipe", recipe);
+  const location = useLocation();
+
+  const getRecipePath = () => {
+    if (basePath) {
+      return `${basePath}/${recipe.id}`;
+    }
+    if (location.pathname.startsWith("/shared-recipes")) {
+      return `/shared-recipes/${recipe.id}`;
+    }
+    if (location.pathname.startsWith("/my-recipes")) {
+      return `/my-recipes/${recipe.id}`;
+    }
+    return recipe.id ? `/my-recipes/${recipe.id}` : "#";
+  };
+
   return (
     <CardWithHeader
       header={
         <div className="flex items-center justify-between">
           {recipe.id ? (
             <Link
-              to={`/recipes/${recipe.id}`}
+              to={getRecipePath()}
               className="text-lg font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
             >
               {recipe.title}
