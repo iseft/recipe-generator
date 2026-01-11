@@ -14,10 +14,4 @@ pub trait RecipeShareRepository: Send + Sync {
         recipe_id: Uuid,
         user_id: &str,
     ) -> impl std::future::Future<Output = Result<(), RepositoryError>> + Send;
-
-    fn exists(
-        &self,
-        recipe_id: Uuid,
-        user_id: &str,
-    ) -> impl std::future::Future<Output = Result<bool, RepositoryError>> + Send;
 }

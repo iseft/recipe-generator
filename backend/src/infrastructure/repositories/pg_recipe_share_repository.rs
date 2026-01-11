@@ -34,32 +34,17 @@ impl RecipeShareRepository for PgRecipeShareRepository {
     }
 
     async fn delete(&self, recipe_id: Uuid, user_id: &str) -> Result<(), RepositoryError> {
-        let result = sqlx::query(
-            "DELETE FROM recipe_shares WHERE recipe_id = $1 AND user_id = $2",
-        )
-        .bind(recipe_id)
-        .bind(user_id)
-        .execute(&self.pool)
-        .await
-        .map_err(|e| RepositoryError::DatabaseError(e.to_string()))?;
+        let result = sqlx::query("DELETE FROM recipe_shares WHERE recipe_id = $1 AND user_id = $2")
+            .bind(recipe_id)
+            .bind(user_id)
+            .execute(&self.pool)
+            .await
+            .map_err(|e| RepositoryError::DatabaseError(e.to_string()))?;
 
         if result.rows_affected() == 0 {
             return Err(RepositoryError::NotFound);
         }
 
         Ok(())
-    }
-
-    async fn exists(&self, recipe_id: Uuid, user_id: &str) -> Result<bool, RepositoryError> {
-        let result: Option<(i64,)> = sqlx::query_as(
-            "SELECT 1 FROM recipe_shares WHERE recipe_id = $1 AND user_id = $2",
-        )
-        .bind(recipe_id)
-        .bind(user_id)
-        .fetch_optional(&self.pool)
-        .await
-        .map_err(|e| RepositoryError::DatabaseError(e.to_string()))?;
-
-        Ok(result.is_some())
     }
 }
