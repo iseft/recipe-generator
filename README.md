@@ -11,72 +11,78 @@ backend/src/
 ├── domain/          # Core business entities and traits (innermost)
 ├── application/     # Use cases and business logic
 ├── adapters/        # HTTP handlers, DTOs, routes
-└── infrastructure/  # External services (OpenAI), config
+└── infrastructure/  # External services (OpenAI), config, database
 ```
 
 **Dependency flow:** Infrastructure → Adapters → Application → Domain
 
 ## Tech Stack
 
-- **Backend:** Rust, Axum
+- **Backend:** Rust, Axum, SQLx
 - **Frontend:** React, TypeScript, Vite, TailwindCSS
+- **Database:** PostgreSQL
 - **LLM:** OpenAI API (gpt-4o-mini)
-- **Validation:** Zod (frontend), validator crate (backend)
+- **Containerization:** Docker, Docker Compose
 
-## Prerequisites
+## Quick Start (Docker)
+
+The fastest way to run the entire application:
+
+```bash
+# 1. Copy environment file and add your OpenAI API key
+cp .env.example .env
+# Edit .env and set OPENAI_API_KEY=sk-your-key
+
+# 2. Start all services
+docker compose up --build
+
+# 3. Access the application
+# Frontend: http://localhost:8080
+# Backend API: http://localhost:3000
+```
+
+To stop:
+```bash
+docker compose down
+```
+
+To stop and remove data:
+```bash
+docker compose down -v
+```
+
+## Local Development
+
+### Prerequisites
 
 - Rust 1.75+ (`rustup update`)
-- Node.js 20+ (use `nvm use` to switch to the version specified in `.nvmrc`)
+- Node.js 20+ (use `nvm use`)
+- PostgreSQL 16+ (or use Docker: `docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=recipe_password -e POSTGRES_USER=recipe_user -e POSTGRES_DB=recipe_generator postgres:16-alpine`)
 - OpenAI API key
 
-## Setup
+### Setup
 
-1. Clone the repository:
+1. Clone and configure:
 ```bash
 git clone <repo-url>
 cd recipe-generator
+cp .env.example .env
+# Edit .env: set OPENAI_API_KEY and DATABASE_URL
 ```
 
-2. Switch to the correct Node.js version (if using nvm):
-```bash
-nvm use
-```
-
-3. Install dependencies:
+2. Install dependencies:
 ```bash
 npm install
 cd frontend && npm install && cd ..
 ```
 
-3. Configure environment:
-```bash
-cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
-```
-
-## Running Locally
-
-### Development (both frontend and backend)
-
+3. Run development servers:
 ```bash
 npm run dev
 ```
 
 - Backend: `http://localhost:3000`
 - Frontend: `http://localhost:5173`
-
-### Production Build
-
-Build and start in one command:
-```bash
-npm run build:start
-```
-
-Or build and start separately:
-```bash
-npm run build
-npm start
-```
 
 ### Run Separately
 
@@ -92,7 +98,15 @@ cd backend
 cargo test
 ```
 
-## API Usage
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check |
+| POST | `/api/recipes/generate` | Generate a recipe from ingredients |
+| POST | `/api/recipes` | Save a generated recipe |
+| GET | `/api/recipes` | List all saved recipes |
+| GET | `/api/recipes/:id` | Get a single recipe |
 
 ### Generate Recipe
 
@@ -105,22 +119,61 @@ curl -X POST http://localhost:3000/api/recipes/generate \
   }'
 ```
 
-**Response:**
-```json
-{
-  "title": "Garlic Chicken and Rice",
-  "ingredients": ["2 cups chicken breast", "1 cup rice", "4 cloves garlic"],
-  "instructions": ["Step 1...", "Step 2..."],
-  "prepTimeMinutes": 10,
-  "cookTimeMinutes": 20,
-  "servings": 4
-}
+### Save Recipe
+
+```bash
+curl -X POST http://localhost:3000/api/recipes \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Garlic Chicken and Rice",
+    "ingredients": ["2 cups chicken breast", "1 cup rice"],
+    "instructions": ["Step 1...", "Step 2..."],
+    "prepTimeMinutes": 10,
+    "cookTimeMinutes": 20,
+    "servings": 4
+  }'
+```
+
+### List Recipes
+
+```bash
+curl http://localhost:3000/api/recipes
+```
+
+### Get Recipe by ID
+
+```bash
+curl http://localhost:3000/api/recipes/<uuid>
 ```
 
 ## Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `PORT` | Server port (default: 3000) | No |
-| `OPENAI_API_KEY` | OpenAI API key | Yes |
-| `CORS_ORIGIN` | Allowed CORS origin (default: http://localhost:5173) | No |
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `OPENAI_API_KEY` | OpenAI API key | - | Yes |
+| `DATABASE_URL` | PostgreSQL connection string | - | Yes |
+| `PORT` | Backend server port | 3000 | No |
+| `CORS_ORIGIN` | Allowed CORS origin | http://localhost:5173 | No |
+| `POSTGRES_USER` | PostgreSQL user (Docker) | recipe_user | No |
+| `POSTGRES_PASSWORD` | PostgreSQL password (Docker) | recipe_password | No |
+| `POSTGRES_DB` | PostgreSQL database (Docker) | recipe_generator | No |
+| `FRONTEND_PORT` | Frontend port (Docker) | 8080 | No |
+| `BACKEND_PORT` | Backend port (Docker) | 3000 | No |
+| `DB_PORT` | Database port (Docker) | 5432 | No |
+| `VITE_API_URL` | Frontend API URL | (empty for nginx proxy) | No |
+
+## Docker Services
+
+The application runs as three containers:
+
+| Service | Description | Port |
+|---------|-------------|------|
+| `frontend` | React app served via nginx | 8080 |
+| `backend` | Rust API server | 3000 |
+| `db` | PostgreSQL database | 5432 |
+
+All services include health checks. The frontend nginx proxies `/api` requests to the backend.
+
+## Database Migrations
+
+Migrations run automatically on backend startup. Migration files are in `backend/migrations/`.
