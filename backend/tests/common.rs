@@ -3,10 +3,11 @@ use std::sync::Arc;
 use axum::Router;
 use backend::adapters::api::routes::create_router;
 use backend::application::use_cases::{
-    GenerateRecipeUseCase, GetRecipeUseCase, ListRecipesUseCase, SaveRecipeUseCase,
+    CreateShareUseCase, DeleteShareUseCase, GenerateRecipeUseCase, GetRecipeUseCase,
+    ListRecipesUseCase, SaveRecipeUseCase,
 };
 use backend::infrastructure::db::create_pool;
-use backend::infrastructure::repositories::PgRecipeRepository;
+use backend::infrastructure::repositories::{PgRecipeRepository, PgRecipeShareRepository};
 use tower::ServiceBuilder;
 use tower_http::cors::CorsLayer;
 
@@ -57,12 +58,19 @@ pub async fn create_test_app_with_llm<T: backend::domain::services::LlmService +
     });
 
     let db_pool = create_pool(&database_url).await;
-    let recipe_repository = Arc::new(PgRecipeRepository::new(db_pool));
+    let recipe_repository = Arc::new(PgRecipeRepository::new(db_pool.clone()));
+    let share_repository = Arc::new(PgRecipeShareRepository::new(db_pool));
 
     let generate_use_case = Arc::new(GenerateRecipeUseCase::new(llm_client));
     let save_use_case = Arc::new(SaveRecipeUseCase::new(recipe_repository.clone()));
     let get_use_case = Arc::new(GetRecipeUseCase::new(recipe_repository.clone()));
-    let list_use_case = Arc::new(ListRecipesUseCase::new(recipe_repository));
+    let list_use_case = Arc::new(ListRecipesUseCase::new(recipe_repository.clone()));
+    let create_share_use_case = Arc::new(CreateShareUseCase::new(
+        recipe_repository.clone(),
+        share_repository.clone(),
+    ));
+    let delete_share_use_case =
+        Arc::new(DeleteShareUseCase::new(recipe_repository, share_repository));
 
     let cors = CorsLayer::new()
         .allow_origin(
@@ -78,6 +86,8 @@ pub async fn create_test_app_with_llm<T: backend::domain::services::LlmService +
         save_use_case,
         get_use_case,
         list_use_case,
+        create_share_use_case,
+        delete_share_use_case,
     )
     .layer(ServiceBuilder::new().layer(cors).into_inner())
 }

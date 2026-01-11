@@ -102,3 +102,10 @@ impl From<SaveRecipeRequest> for GeneratedRecipe {
         }
     }
 }
+
+#[derive(Debug, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateShareRequest {
+    #[validate(length(min = 1))]
+    pub user_id: String,
+}

@@ -3,6 +3,7 @@ pub struct AppConfig {
     pub openai_api_key: String,
     pub cors_origin: String,
     pub database_url: String,
+    pub clerk_secret_key: String,
 }
 
 impl AppConfig {
@@ -24,6 +25,8 @@ impl AppConfig {
             cors_origin: std::env::var("CORS_ORIGIN")
                 .unwrap_or_else(|_| "http://localhost:5173".to_string()),
             database_url,
+            clerk_secret_key: std::env::var("CLERK_SECRET_KEY")
+                .expect("CLERK_SECRET_KEY must be set"),
         }
     }
 }

@@ -1,13 +1,14 @@
 use axum::{
     Router,
-    routing::{get, post},
+    routing::{delete, get, post},
 };
 use std::sync::Arc;
 
 use crate::application::use_cases::{
-    GenerateRecipeUseCase, GetRecipeUseCase, ListRecipesUseCase, SaveRecipeUseCase,
+    CreateShareUseCase, DeleteShareUseCase, GenerateRecipeUseCase, GetRecipeUseCase,
+    ListRecipesUseCase, SaveRecipeUseCase,
 };
-use crate::domain::repositories::RecipeRepository;
+use crate::domain::repositories::{RecipeRepository, RecipeShareRepository};
 use crate::domain::services::LlmService;
 
 use super::handlers;
@@ -17,26 +18,40 @@ async fn health() -> &'static str {
     "OK"
 }
 
-pub fn create_router<T: LlmService + 'static, R: RecipeRepository + 'static>(
+pub fn create_router<
+    T: LlmService + 'static,
+    R: RecipeRepository + 'static,
+    S: RecipeShareRepository + 'static,
+>(
     generate_use_case: Arc<GenerateRecipeUseCase<T>>,
     save_use_case: Arc<SaveRecipeUseCase<R>>,
     get_use_case: Arc<GetRecipeUseCase<R>>,
     list_use_case: Arc<ListRecipesUseCase<R>>,
+    create_share_use_case: Arc<CreateShareUseCase<R, S>>,
+    delete_share_use_case: Arc<DeleteShareUseCase<R, S>>,
 ) -> Router {
     let state = AppState {
         generate_use_case,
         save_use_case,
         get_use_case,
         list_use_case,
+        create_share_use_case,
+        delete_share_use_case,
     };
 
     Router::new()
         .route("/health", get(health))
         .route("/api/recipes/generate", post(handlers::generate_recipe))
+        .route("/api/recipes/shared", get(handlers::list_shared_recipes))
         .route(
             "/api/recipes",
-            post(handlers::save_recipe).get(handlers::list_recipes),
+            post(handlers::save_recipe).get(handlers::list_my_recipes),
         )
         .route("/api/recipes/{id}", get(handlers::get_recipe))
+        .route("/api/recipes/{id}/shares", post(handlers::create_share))
+        .route(
+            "/api/recipes/{recipe_id}/shares/{user_id}",
+            delete(handlers::delete_share),
+        )
         .with_state(state)
 }

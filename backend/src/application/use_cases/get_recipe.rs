@@ -14,7 +14,8 @@ impl<T: RecipeRepository> GetRecipeUseCase<T> {
     pub async fn execute(
         &self,
         id: Uuid,
+        user_id: &str,
     ) -> Result<crate::domain::entities::Recipe, RepositoryError> {
-        self.repository.find_by_id(id).await
+        self.repository.find_by_id_with_access(id, user_id).await
     }
 }

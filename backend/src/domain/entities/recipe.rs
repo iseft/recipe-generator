@@ -15,6 +15,7 @@ pub struct GeneratedRecipe {
 #[derive(Debug, Clone, Serialize, sqlx::FromRow)]
 pub struct Recipe {
     pub id: Uuid,
+    pub owner_id: String,
     pub title: String,
     pub ingredients: Vec<String>,
     pub instructions: Vec<String>,
@@ -25,9 +26,10 @@ pub struct Recipe {
 }
 
 impl Recipe {
-    pub fn from_generated(generated: GeneratedRecipe) -> Self {
+    pub fn from_generated(generated: GeneratedRecipe, owner_id: String) -> Self {
         Self {
             id: Uuid::new_v4(),
+            owner_id,
             title: generated.title,
             ingredients: generated.ingredients,
             instructions: generated.instructions,
@@ -100,9 +102,10 @@ mod tests {
             servings: Some(2),
         };
 
-        let recipe = Recipe::from_generated(generated);
+        let recipe = Recipe::from_generated(generated, "user_123".to_string());
 
         assert_eq!(recipe.title, "Test");
+        assert_eq!(recipe.owner_id, "user_123");
         assert!(!recipe.id.is_nil());
     }
 }

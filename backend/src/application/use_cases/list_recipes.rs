@@ -11,7 +11,11 @@ impl<T: RecipeRepository> ListRecipesUseCase<T> {
         Self { repository }
     }
 
-    pub async fn execute(&self) -> Result<Vec<Recipe>, RepositoryError> {
-        self.repository.find_all().await
+    pub async fn execute_owned(&self, owner_id: &str) -> Result<Vec<Recipe>, RepositoryError> {
+        self.repository.find_by_owner(owner_id).await
+    }
+
+    pub async fn execute_shared(&self, user_id: &str) -> Result<Vec<Recipe>, RepositoryError> {
+        self.repository.find_shared_with_user(user_id).await
     }
 }
