@@ -19,12 +19,14 @@ backend/src/
 ## Tech Stack
 
 - **Backend:** Rust, Axum
+- **Frontend:** React, TypeScript, Vite, TailwindCSS
 - **LLM:** OpenAI API (gpt-4o-mini)
-- **Validation:** validator crate with custom Axum extractor
+- **Validation:** Zod (frontend), validator crate (backend)
 
 ## Prerequisites
 
 - Rust 1.75+ (`rustup update`)
+- Node.js 20+ (use `nvm use` to switch to the version specified in `.nvmrc`)
 - OpenAI API key
 
 ## Setup
@@ -35,22 +37,53 @@ git clone <repo-url>
 cd recipe-generator
 ```
 
-2. Configure environment:
+2. Switch to the correct Node.js version (if using nvm):
 ```bash
-cp backend/.env.example backend/.env
-# Edit backend/.env and add your OPENAI_API_KEY
+nvm use
+```
+
+3. Install dependencies:
+```bash
+npm install
+cd frontend && npm install && cd ..
+```
+
+3. Configure environment:
+```bash
+cp .env.example .env
+# Edit .env and add your OPENAI_API_KEY
 ```
 
 ## Running Locally
 
-### Backend
+### Development (both frontend and backend)
 
 ```bash
-cd backend
-cargo run
+npm run dev
 ```
 
-Server starts at `http://localhost:3000`
+- Backend: `http://localhost:3000`
+- Frontend: `http://localhost:5173`
+
+### Production Build
+
+Build and start in one command:
+```bash
+npm run build:start
+```
+
+Or build and start separately:
+```bash
+npm run build
+npm start
+```
+
+### Run Separately
+
+```bash
+npm run dev:backend   # Backend only
+npm run dev:frontend  # Frontend only
+```
 
 ### Run Tests
 
