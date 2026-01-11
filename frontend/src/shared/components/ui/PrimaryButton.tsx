@@ -1,4 +1,4 @@
-import { classNames } from "../utils/classNames";
+import { classNames } from "../../utils/classNames";
 
 type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 

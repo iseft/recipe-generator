@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { ExclamationCircleIcon } from "@heroicons/react/16/solid";
-import { classNames } from "../utils/classNames";
+import { classNames } from "../../utils/classNames";
 
 const baseClasses =
   "block w-full rounded-md py-1.5 pl-3 sm:text-sm/6 dark:bg-white/5";

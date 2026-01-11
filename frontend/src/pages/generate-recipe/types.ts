@@ -20,12 +20,14 @@ export type GenerateRecipeFormData = z.input<typeof generateRecipeFormSchema>;
 export type GenerateRecipeRequest = z.output<typeof generateRecipeFormSchema>;
 
 export interface Recipe {
+  id?: string;
   title: string;
   ingredients: string[];
   instructions: string[];
   prepTimeMinutes?: number;
   cookTimeMinutes?: number;
   servings?: number;
+  createdAt?: string;
 }
 
 export interface ApiError {

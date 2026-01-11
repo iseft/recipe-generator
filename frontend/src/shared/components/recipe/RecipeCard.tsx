@@ -1,5 +1,6 @@
-import CardWithHeader from "../../../shared/components/CardWithHeader";
-import type { Recipe } from "../types";
+import { Link } from "react-router-dom";
+import CardWithHeader from "../ui/CardWithHeader";
+import type { Recipe } from "../../../pages/generate-recipe/types";
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -10,9 +11,18 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
     <CardWithHeader
       header={
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {recipe.title}
-          </h2>
+          {recipe.id ? (
+            <Link
+              to={`/recipes/${recipe.id}`}
+              className="text-lg font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            >
+              {recipe.title}
+            </Link>
+          ) : (
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {recipe.title}
+            </h2>
+          )}
           <div className="flex gap-4 text-sm text-gray-500 dark:text-gray-400">
             {recipe.prepTimeMinutes && (
               <span>Prep: {recipe.prepTimeMinutes}min</span>
