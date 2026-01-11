@@ -1,7 +1,15 @@
 import axios, { type AxiosRequestConfig } from "axios";
 
+const getBaseURL = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  if (apiUrl && apiUrl.trim() !== "") {
+    return apiUrl;
+  }
+  return "";
+};
+
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
+  baseURL: getBaseURL(),
 });
 
 class APIClient<T> {
@@ -12,7 +20,9 @@ class APIClient<T> {
   }
 
   getAll = (config?: AxiosRequestConfig) => {
-    return axiosInstance.get<T[]>(this.endpoint, config).then((res) => res.data);
+    return axiosInstance
+      .get<T[]>(this.endpoint, config)
+      .then((res) => res.data);
   };
 
   get = (id: number | string, config?: AxiosRequestConfig) => {
