@@ -30,17 +30,25 @@ pub async fn generate_recipe<T: LlmService, R: RecipeRepository>(
         .execute(request.ingredients, request.dietary_restrictions)
         .await
         .map_err(|e| {
-            let (status, message) = match e {
-                LlmError::ApiError(_) => (
+            let (status, user_message, log_message) = match &e {
+                LlmError::ApiError(msg) => (
                     StatusCode::BAD_GATEWAY,
-                    "Failed to reach AI service".to_string(),
+                    "Failed to reach AI service. Please try again later.",
+                    format!("AI API error: {}", msg),
                 ),
-                LlmError::ParseError(_) => (
+                LlmError::ParseError(msg) => (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    "Failed to parse AI response".to_string(),
+                    "Failed to process AI response. Please try again.",
+                    format!("AI response parse error: {}", msg),
                 ),
             };
-            (status, Json(ErrorResponse { error: message }))
+            eprintln!("Error: {}", log_message);
+            (
+                status,
+                Json(ErrorResponse {
+                    error: user_message.to_string(),
+                }),
+            )
         })?;
 
     Ok(Json(recipe.into()))

@@ -30,14 +30,34 @@ impl backend::domain::services::LlmService for MockLlmClient {
     }
 }
 
+pub struct FailingLlmClient {
+    pub error: backend::domain::services::LlmError,
+}
+
+impl backend::domain::services::LlmService for FailingLlmClient {
+    async fn generate_recipe(
+        &self,
+        _ingredients: Vec<String>,
+        _dietary_restrictions: Option<Vec<String>>,
+    ) -> Result<backend::domain::entities::GeneratedRecipe, backend::domain::services::LlmError>
+    {
+        Err(self.error.clone())
+    }
+}
+
 pub async fn create_test_app() -> Router {
+    create_test_app_with_llm(Arc::new(MockLlmClient)).await
+}
+
+pub async fn create_test_app_with_llm<T: backend::domain::services::LlmService + 'static>(
+    llm_client: Arc<T>,
+) -> Router {
     let database_url = std::env::var("TEST_DATABASE_URL").unwrap_or_else(|_| {
         "postgres://recipe_user:recipe_password@localhost:5432/recipe_generator_test".to_string()
     });
 
     let db_pool = create_pool(&database_url).await;
     let recipe_repository = Arc::new(PgRecipeRepository::new(db_pool));
-    let llm_client = Arc::new(MockLlmClient);
 
     let generate_use_case = Arc::new(GenerateRecipeUseCase::new(llm_client));
     let save_use_case = Arc::new(SaveRecipeUseCase::new(recipe_repository.clone()));

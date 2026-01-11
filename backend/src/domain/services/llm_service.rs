@@ -9,7 +9,7 @@ pub trait LlmService: Send + Sync {
     ) -> impl Future<Output = Result<GeneratedRecipe, LlmError>> + Send;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum LlmError {
     ApiError(String),
     ParseError(String),

@@ -3,6 +3,7 @@ use axum::{
     http::{Request, StatusCode},
 };
 use sqlx::{PgPool, postgres::PgPoolOptions};
+use std::sync::Arc;
 use tower::util::ServiceExt;
 use uuid::Uuid;
 
@@ -180,4 +181,96 @@ async fn test_get_nonexistent_recipe() {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn test_api_error_not_exposed_to_client() {
+    let detailed_error_msg = "Connection timeout to api.openai.com:443";
+    let failing_llm = Arc::new(common::FailingLlmClient {
+        error: backend::domain::services::LlmError::ApiError(detailed_error_msg.to_string()),
+    });
+
+    let app = common::create_test_app_with_llm(failing_llm).await;
+
+    let request_body = serde_json::json!({
+        "ingredients": ["chicken", "rice"]
+    });
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/api/recipes/generate")
+                .header("content-type", "application/json")
+                .body(Body::from(serde_json::to_string(&request_body).unwrap()))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::BAD_GATEWAY);
+
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let error_response: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    let error_message = error_response["error"].as_str().unwrap();
+
+    assert!(
+        !error_message.contains(detailed_error_msg),
+        "Detailed error message should not be exposed to client"
+    );
+    assert!(
+        !error_message.contains("api.openai.com"),
+        "Internal details should not be exposed to client"
+    );
+
+    assert!(
+        error_message.contains("Failed to reach AI service"),
+        "Should contain generic user-friendly message"
+    );
+}
+
+#[tokio::test]
+async fn test_parse_error_not_exposed_to_client() {
+    let detailed_error_msg = "expected value at line 5 column 12: invalid JSON";
+    let failing_llm = Arc::new(common::FailingLlmClient {
+        error: backend::domain::services::LlmError::ParseError(detailed_error_msg.to_string()),
+    });
+
+    let app = common::create_test_app_with_llm(failing_llm).await;
+
+    let request_body = serde_json::json!({
+        "ingredients": ["chicken", "rice"]
+    });
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/api/recipes/generate")
+                .header("content-type", "application/json")
+                .body(Body::from(serde_json::to_string(&request_body).unwrap()))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let error_response: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    let error_message = error_response["error"].as_str().unwrap();
+
+    assert!(
+        !error_message.contains(detailed_error_msg),
+        "Detailed error message should not be exposed to client"
+    );
+    assert!(
+        !error_message.contains("line 5 column 12"),
+        "Internal parsing details should not be exposed to client"
+    );
+
+    assert!(
+        error_message.contains("Failed to process AI response"),
+        "Should contain generic user-friendly message"
+    );
 }
