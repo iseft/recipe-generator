@@ -97,7 +97,7 @@ cargo test
 ### Generate Recipe
 
 ```bash
-curl -X POST http://localhost:3000/api/recipe \
+curl -X POST http://localhost:3000/api/recipes/generate \
   -H "Content-Type: application/json" \
   -d '{
     "ingredients": ["chicken", "rice", "garlic"],

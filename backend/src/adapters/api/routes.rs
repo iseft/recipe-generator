@@ -8,6 +8,9 @@ use super::handlers;
 
 pub fn create_router<T: LlmService + 'static>(use_case: Arc<GenerateRecipeUseCase<T>>) -> Router {
     Router::new()
-        .route("/api/recipe", post(handlers::generate_recipe::<T>))
+        .route(
+            "/api/recipes/generate",
+            post(handlers::generate_recipe::<T>),
+        )
         .with_state(use_case)
 }
