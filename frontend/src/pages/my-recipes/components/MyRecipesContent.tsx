@@ -29,7 +29,12 @@ export default function MyRecipesContent() {
   return (
     <div className="space-y-6">
       {recipesArray.map((recipe) => (
-        <RecipeCard key={recipe.id} recipe={recipe} />
+        <RecipeCard 
+          key={recipe.id} 
+          recipe={recipe} 
+          linkTo={`/my-recipes/${recipe.id}`}
+          showShareButton={true}
+        />
       ))}
     </div>
   );

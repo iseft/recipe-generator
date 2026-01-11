@@ -29,7 +29,7 @@ export default function MyRecipeDetailContent({
 
   return (
     <div className="space-y-6">
-      <RecipeCard recipe={recipe} />
+      <RecipeCard recipe={recipe} showShareButton={true} />
     </div>
   );
 }

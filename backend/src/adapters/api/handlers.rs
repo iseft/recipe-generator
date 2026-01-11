@@ -97,7 +97,17 @@ pub async fn get_recipe<T: LlmService, R: RecipeRepository, S: RecipeShareReposi
         .await
         .map_err(map_repo_error)?;
 
-    Ok(Json(recipe.into()))
+    let mut response: RecipeResponse = recipe.into();
+
+    if response.owner_id != user.user_id {
+        if let Ok(Some(email)) =
+            crate::infrastructure::auth::get_user_email_by_id(&response.owner_id).await
+        {
+            response = response.with_owner_email(Some(email));
+        }
+    }
+
+    Ok(Json(response))
 }
 
 pub async fn list_my_recipes<T: LlmService, R: RecipeRepository, S: RecipeShareRepository>(
@@ -126,7 +136,9 @@ pub async fn list_shared_recipes<T: LlmService, R: RecipeRepository, S: RecipeSh
     let mut responses: Vec<RecipeResponse> = Vec::new();
     for recipe in recipes {
         let mut response: RecipeResponse = recipe.into();
-        if let Ok(Some(email)) = crate::infrastructure::auth::get_user_email_by_id(&response.owner_id).await {
+        if let Ok(Some(email)) =
+            crate::infrastructure::auth::get_user_email_by_id(&response.owner_id).await
+        {
             response = response.with_owner_email(Some(email));
         }
         responses.push(response);

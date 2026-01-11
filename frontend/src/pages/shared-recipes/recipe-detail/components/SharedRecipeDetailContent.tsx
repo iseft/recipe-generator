@@ -29,7 +29,7 @@ export default function SharedRecipeDetailContent({
 
   return (
     <div className="space-y-6">
-      <RecipeCard recipe={recipe} />
+      <RecipeCard recipe={recipe} showSharedBy={true} />
     </div>
   );
 }

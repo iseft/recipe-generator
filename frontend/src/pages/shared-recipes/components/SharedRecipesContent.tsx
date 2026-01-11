@@ -32,7 +32,12 @@ export default function SharedRecipesContent() {
   return (
     <div className="space-y-6">
       {recipesArray.map((recipe) => (
-        <RecipeCard key={recipe.id} recipe={recipe} />
+        <RecipeCard 
+          key={recipe.id} 
+          recipe={recipe} 
+          linkTo={`/shared-recipes/${recipe.id}`}
+          showSharedBy={true}
+        />
       ))}
     </div>
   );

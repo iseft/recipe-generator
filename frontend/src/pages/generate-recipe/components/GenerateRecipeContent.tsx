@@ -37,7 +37,7 @@ export default function GenerateRecipeContent() {
 
       {data && !isPending && (
         <>
-          <RecipeCard recipe={data} />
+          <RecipeCard recipe={data} showShareButton={false} />
           <SignedIn>
             {!data.id && (
               <div className="pt-4">
