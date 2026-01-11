@@ -27,24 +27,35 @@ export default function RecipeCard({ recipe, basePath }: RecipeCardProps) {
   };
 
   const isOwner = recipe.ownerId === userId && recipe.id;
+  const isSharedRecipe =
+    !isOwner &&
+    recipe.ownerId &&
+    location.pathname.startsWith("/shared-recipes");
 
   return (
     <CardWithHeader
       header={
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            {recipe.id ? (
-              <Link
-                to={getRecipePath()}
-                className="text-lg font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-              >
-                {recipe.title}
-              </Link>
-            ) : (
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {recipe.title}
-              </h2>
-            )}
+            <div>
+              {recipe.id ? (
+                <Link
+                  to={getRecipePath()}
+                  className="text-lg font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                >
+                  {recipe.title}
+                </Link>
+              ) : (
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {recipe.title}
+                </h2>
+              )}
+              {isSharedRecipe && recipe.ownerEmail && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Shared by {recipe.ownerEmail}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex gap-4 text-sm text-gray-500 dark:text-gray-400">

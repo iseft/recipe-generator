@@ -53,6 +53,8 @@ impl From<GeneratedRecipe> for GeneratedRecipeResponse {
 pub struct RecipeResponse {
     pub id: Uuid,
     pub owner_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_email: Option<String>,
     pub title: String,
     pub ingredients: Vec<String>,
     pub instructions: Vec<String>,
@@ -67,6 +69,7 @@ impl From<Recipe> for RecipeResponse {
         Self {
             id: recipe.id,
             owner_id: recipe.owner_id,
+            owner_email: None,
             title: recipe.title,
             ingredients: recipe.ingredients,
             instructions: recipe.instructions,
@@ -75,6 +78,13 @@ impl From<Recipe> for RecipeResponse {
             servings: recipe.servings,
             created_at: recipe.created_at,
         }
+    }
+}
+
+impl RecipeResponse {
+    pub fn with_owner_email(mut self, email: Option<String>) -> Self {
+        self.owner_email = email;
+        self
     }
 }
 

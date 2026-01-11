@@ -22,6 +22,7 @@ export type GenerateRecipeRequest = z.output<typeof generateRecipeFormSchema>;
 export interface Recipe {
   id?: string;
   ownerId?: string;
+  ownerEmail?: string;
   title: string;
   ingredients: string[];
   instructions: string[];

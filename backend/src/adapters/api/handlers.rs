@@ -123,7 +123,16 @@ pub async fn list_shared_recipes<T: LlmService, R: RecipeRepository, S: RecipeSh
         .await
         .map_err(map_repo_error)?;
 
-    Ok(Json(recipes.into_iter().map(|r| r.into()).collect()))
+    let mut responses: Vec<RecipeResponse> = Vec::new();
+    for recipe in recipes {
+        let mut response: RecipeResponse = recipe.into();
+        if let Ok(Some(email)) = crate::infrastructure::auth::get_user_email_by_id(&response.owner_id).await {
+            response = response.with_owner_email(Some(email));
+        }
+        responses.push(response);
+    }
+
+    Ok(Json(responses))
 }
 
 pub async fn create_share<T: LlmService, R: RecipeRepository, S: RecipeShareRepository>(
