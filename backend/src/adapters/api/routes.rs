@@ -13,6 +13,10 @@ use crate::domain::services::LlmService;
 use super::handlers;
 use super::state::AppState;
 
+async fn health() -> &'static str {
+    "OK"
+}
+
 pub fn create_router<T: LlmService + 'static, R: RecipeRepository + 'static>(
     generate_use_case: Arc<GenerateRecipeUseCase<T>>,
     save_use_case: Arc<SaveRecipeUseCase<R>>,
@@ -27,6 +31,7 @@ pub fn create_router<T: LlmService + 'static, R: RecipeRepository + 'static>(
     };
 
     Router::new()
+        .route("/health", get(health))
         .route("/api/recipes/generate", post(handlers::generate_recipe))
         .route(
             "/api/recipes",
