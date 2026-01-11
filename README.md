@@ -189,6 +189,8 @@ curl http://localhost:3000/api/recipes/<uuid>
 | `POSTGRES_USER` | PostgreSQL user | Yes |
 | `POSTGRES_PASSWORD` | PostgreSQL password | Yes |
 | `POSTGRES_DB` | PostgreSQL database name | Yes |
+| `CLERK_SECRET_KEY` | Clerk secret key (backend) | Yes |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key (frontend) | Yes |
 
 ### Optional (with defaults)
 | Variable | Description | Default |
@@ -218,3 +220,56 @@ All services include health checks. The frontend nginx proxies `/api` requests t
 ## Database Migrations
 
 Migrations run automatically on backend startup. Migration files are in `backend/migrations/`.
+
+## Authentication Setup (Clerk)
+
+This application uses [Clerk](https://clerk.com) for authentication.
+
+### Getting Your Clerk Keys
+
+1. Sign up at [clerk.com](https://clerk.com) and create an application
+2. In the Clerk Dashboard (https://dashboard.clerk.com/), go to **Configure** -> **API Keys**
+3. Copy the **Secret Key** → set as `CLERK_SECRET_KEY` in your `.env` file
+4. Copy the **Publishable Key** → set as `VITE_CLERK_PUBLISHABLE_KEY` in your `.env` file
+
+That's it! No additional configuration needed. The app uses Clerk's React components which handle authentication automatically, and the backend verifies JWT tokens from the frontend.
+
+### Example .env File
+
+```bash
+# OpenAI
+OPENAI_API_KEY=sk-your-openai-key
+
+# Database
+POSTGRES_USER=recipe_user
+POSTGRES_PASSWORD=recipe_password
+POSTGRES_DB=recipe_generator
+DB_HOST=localhost
+DB_PORT=5432
+
+# Clerk Authentication
+CLERK_SECRET_KEY=sk_test_your-clerk-secret-key
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your-clerk-publishable-key
+
+# Server
+PORT=3000
+CORS_ORIGIN=http://localhost:5173
+```
+
+## Security Considerations
+
+### Authentication & Authorization
+
+- **JWT Verification**: All protected endpoints verify JWT tokens from Clerk
+- **Access Control**: 
+  - Recipe owners can view, save, and share their recipes
+  - Shared users can only view recipes shared with them
+  - Unauthenticated users can only generate recipes (cannot save or share)
+- **User Isolation**: Recipes are scoped to their owner (`owner_id` field)
+
+### API Security
+
+- **Protected Endpoints**: All endpoints except `/health` and `/api/recipes/generate` require authentication
+- **Error Handling**: Detailed error messages are logged server-side but generic messages are returned to clients
+- **Input Validation**: All API requests are validated using `validator` crate
+- **SQL Injection Prevention**: Using parameterized queries via `sqlx`
