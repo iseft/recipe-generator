@@ -4,7 +4,7 @@ use axum::Router;
 use backend::adapters::api::routes::create_router;
 use backend::application::use_cases::{
     CreateShareUseCase, DeleteShareUseCase, GenerateRecipeUseCase, GetRecipeUseCase,
-    ListRecipesUseCase, SaveRecipeUseCase,
+    ListOwnedRecipesUseCase, ListSharedRecipesUseCase, SaveRecipeUseCase,
 };
 use backend::infrastructure::auth::init_clerk;
 use backend::infrastructure::db::create_pool;
@@ -67,7 +67,8 @@ pub async fn create_test_app_with_llm<T: backend::domain::services::LlmService +
     let generate_use_case = Arc::new(GenerateRecipeUseCase::new(llm_client));
     let save_use_case = Arc::new(SaveRecipeUseCase::new(recipe_repository.clone()));
     let get_use_case = Arc::new(GetRecipeUseCase::new(recipe_repository.clone()));
-    let list_use_case = Arc::new(ListRecipesUseCase::new(recipe_repository.clone()));
+    let list_owned_use_case = Arc::new(ListOwnedRecipesUseCase::new(recipe_repository.clone()));
+    let list_shared_use_case = Arc::new(ListSharedRecipesUseCase::new(recipe_repository.clone()));
     let create_share_use_case = Arc::new(CreateShareUseCase::new(
         recipe_repository.clone(),
         share_repository.clone(),
@@ -88,7 +89,8 @@ pub async fn create_test_app_with_llm<T: backend::domain::services::LlmService +
         generate_use_case,
         save_use_case,
         get_use_case,
-        list_use_case,
+        list_owned_use_case,
+        list_shared_use_case,
         create_share_use_case,
         delete_share_use_case,
     )

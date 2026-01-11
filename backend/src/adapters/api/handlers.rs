@@ -115,8 +115,8 @@ pub async fn list_my_recipes<T: LlmService, R: RecipeRepository, S: RecipeShareR
     user: AuthenticatedUser,
 ) -> Result<Json<Vec<RecipeResponse>>, (StatusCode, Json<ErrorResponse>)> {
     let recipes = state
-        .list_use_case
-        .execute_owned(&user.user_id)
+        .list_owned_use_case
+        .execute(&user.user_id)
         .await
         .map_err(map_repo_error)?;
 
@@ -128,8 +128,8 @@ pub async fn list_shared_recipes<T: LlmService, R: RecipeRepository, S: RecipeSh
     user: AuthenticatedUser,
 ) -> Result<Json<Vec<RecipeResponse>>, (StatusCode, Json<ErrorResponse>)> {
     let recipes = state
-        .list_use_case
-        .execute_shared(&user.user_id)
+        .list_shared_use_case
+        .execute(&user.user_id)
         .await
         .map_err(map_repo_error)?;
 

@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use crate::application::use_cases::{
     CreateShareUseCase, DeleteShareUseCase, GenerateRecipeUseCase, GetRecipeUseCase,
-    ListRecipesUseCase, SaveRecipeUseCase,
+    ListOwnedRecipesUseCase, ListSharedRecipesUseCase, SaveRecipeUseCase,
 };
 use crate::domain::repositories::{RecipeRepository, RecipeShareRepository};
 use crate::domain::services::LlmService;
@@ -27,7 +27,8 @@ pub fn create_router<
     generate_use_case: Arc<GenerateRecipeUseCase<T>>,
     save_use_case: Arc<SaveRecipeUseCase<R>>,
     get_use_case: Arc<GetRecipeUseCase<R>>,
-    list_use_case: Arc<ListRecipesUseCase<R>>,
+    list_owned_use_case: Arc<ListOwnedRecipesUseCase<R>>,
+    list_shared_use_case: Arc<ListSharedRecipesUseCase<R>>,
     create_share_use_case: Arc<CreateShareUseCase<R, S>>,
     delete_share_use_case: Arc<DeleteShareUseCase<R, S>>,
 ) -> Router {
@@ -35,7 +36,8 @@ pub fn create_router<
         generate_use_case,
         save_use_case,
         get_use_case,
-        list_use_case,
+        list_owned_use_case,
+        list_shared_use_case,
         create_share_use_case,
         delete_share_use_case,
     };
