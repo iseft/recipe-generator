@@ -3,6 +3,7 @@ use axum::{
     http::{StatusCode, request::Parts},
 };
 use clerk_rs::validators::authorizer::ClerkJwt;
+use serde::Deserialize;
 use std::sync::OnceLock;
 
 pub use clerk_rs::{
@@ -12,8 +13,10 @@ pub use clerk_rs::{
 };
 
 static CLERK_CLIENT: OnceLock<Clerk> = OnceLock::new();
+static CLERK_SECRET_KEY: OnceLock<String> = OnceLock::new();
 
 pub fn init_clerk(secret_key: String) {
+    CLERK_SECRET_KEY.set(secret_key.clone()).ok();
     let config = ClerkConfiguration::new(None, None, Some(secret_key), None);
     let clerk = Clerk::new(config);
     CLERK_CLIENT.set(clerk).ok();
@@ -21,6 +24,40 @@ pub fn init_clerk(secret_key: String) {
 
 pub fn get_clerk() -> Option<&'static Clerk> {
     CLERK_CLIENT.get()
+}
+
+#[derive(Debug, Deserialize)]
+struct ClerkUser {
+    id: String,
+}
+
+// Workaround: clerk-rs crate doesn't provide a method to query users by email,
+// so we use the Clerk REST API directly via HTTP request.
+// TODO: Switch to clerk-rs API when/if this functionality is added to the crate.
+pub async fn get_user_id_by_email(email: &str) -> Result<Option<String>, String> {
+    let secret_key = CLERK_SECRET_KEY.get().ok_or("Clerk not initialized")?;
+
+    let client = reqwest::Client::new();
+    let response = client
+        .get(format!(
+            "https://api.clerk.com/v1/users?email_address={}",
+            urlencoding::encode(email)
+        ))
+        .header("Authorization", format!("Bearer {}", secret_key))
+        .send()
+        .await
+        .map_err(|e| format!("Failed to query Clerk API: {}", e))?;
+
+    if !response.status().is_success() {
+        return Err(format!("Clerk API returned status: {}", response.status()));
+    }
+
+    let users: Vec<ClerkUser> = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse Clerk response: {}", e))?;
+
+    Ok(users.first().map(|u| u.id.clone()))
 }
 
 pub fn create_clerk_layer() -> ClerkLayer<MemoryCacheJwksProvider> {

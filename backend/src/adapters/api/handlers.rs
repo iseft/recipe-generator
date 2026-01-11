@@ -130,9 +130,30 @@ pub async fn create_share<T: LlmService, R: RecipeRepository, S: RecipeShareRepo
     Path(recipe_id): Path<Uuid>,
     ValidatedJson(request): ValidatedJson<CreateShareRequest>,
 ) -> Result<StatusCode, (StatusCode, Json<ErrorResponse>)> {
+    let user_id = match crate::infrastructure::auth::get_user_id_by_email(&request.email).await {
+        Ok(Some(id)) => id,
+        Ok(None) => {
+            return Err((
+                StatusCode::NOT_FOUND,
+                Json(ErrorResponse {
+                    error: "User with this email not found".to_string(),
+                }),
+            ));
+        }
+        Err(e) => {
+            eprintln!("Failed to lookup user by email: {}", e);
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ErrorResponse {
+                    error: "Failed to lookup user".to_string(),
+                }),
+            ));
+        }
+    };
+
     state
         .create_share_use_case
-        .execute(recipe_id, &user.user_id, request.user_id)
+        .execute(recipe_id, &user.user_id, user_id)
         .await
         .map_err(map_repo_error)?;
 

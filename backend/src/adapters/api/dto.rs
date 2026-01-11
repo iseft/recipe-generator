@@ -52,6 +52,7 @@ impl From<GeneratedRecipe> for GeneratedRecipeResponse {
 #[serde(rename_all = "camelCase")]
 pub struct RecipeResponse {
     pub id: Uuid,
+    pub owner_id: String,
     pub title: String,
     pub ingredients: Vec<String>,
     pub instructions: Vec<String>,
@@ -65,6 +66,7 @@ impl From<Recipe> for RecipeResponse {
     fn from(recipe: Recipe) -> Self {
         Self {
             id: recipe.id,
+            owner_id: recipe.owner_id,
             title: recipe.title,
             ingredients: recipe.ingredients,
             instructions: recipe.instructions,
@@ -106,6 +108,6 @@ impl From<SaveRecipeRequest> for GeneratedRecipe {
 #[derive(Debug, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateShareRequest {
-    #[validate(length(min = 1))]
-    pub user_id: String,
+    #[validate(email)]
+    pub email: String,
 }

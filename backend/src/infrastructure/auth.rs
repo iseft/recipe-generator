@@ -1,3 +1,3 @@
 pub mod clerk;
 
-pub use clerk::{init_clerk, create_clerk_layer, AuthenticatedUser};
+pub use clerk::{init_clerk, create_clerk_layer, get_user_id_by_email, AuthenticatedUser};
