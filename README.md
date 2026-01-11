@@ -148,19 +148,26 @@ curl http://localhost:3000/api/recipes/<uuid>
 
 ## Environment Variables
 
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `OPENAI_API_KEY` | OpenAI API key | - | Yes |
-| `DATABASE_URL` | PostgreSQL connection string | - | Yes |
-| `PORT` | Backend server port | 3000 | No |
-| `CORS_ORIGIN` | Allowed CORS origin | http://localhost:5173 | No |
-| `POSTGRES_USER` | PostgreSQL user (Docker) | recipe_user | No |
-| `POSTGRES_PASSWORD` | PostgreSQL password (Docker) | recipe_password | No |
-| `POSTGRES_DB` | PostgreSQL database (Docker) | recipe_generator | No |
-| `FRONTEND_PORT` | Frontend port (Docker) | 8080 | No |
-| `BACKEND_PORT` | Backend port (Docker) | 3000 | No |
-| `DB_PORT` | Database port (Docker) | 5432 | No |
-| `VITE_API_URL` | Frontend API URL | (empty for nginx proxy) | No |
+### Required
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `OPENAI_API_KEY` | OpenAI API key | Yes |
+| `POSTGRES_USER` | PostgreSQL user | Yes |
+| `POSTGRES_PASSWORD` | PostgreSQL password | Yes |
+| `POSTGRES_DB` | PostgreSQL database name | Yes |
+
+### Optional (with defaults)
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DB_HOST` | Database host | localhost (local) / db (Docker) |
+| `DB_PORT` | Database port | 5432 |
+| `PORT` | Backend server port | 3000 |
+| `CORS_ORIGIN` | Allowed CORS origin | http://localhost:5173 (local) / http://localhost:8080 (Docker) |
+| `FRONTEND_PORT` | Frontend port (Docker) | 8080 |
+| `BACKEND_PORT` | Backend port (Docker) | 3000 |
+| `VITE_API_URL` | Frontend API URL (leave empty for nginx proxy) | "" |
+
+**Note:** `DATABASE_URL` is automatically constructed from `POSTGRES_*` vars. For Docker, set `DB_HOST=db` in docker-compose (already configured).
 
 ## Docker Services
 
