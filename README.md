@@ -62,15 +62,25 @@ docker compose down -v
 
 ### Local Database Setup
 
-Run the setup script to create the PostgreSQL container and databases:
+**Initial setup**:
 ```bash
 ./create-local-db.sh
 ```
 
 This script will:
 - Create and start a PostgreSQL container named `recipe-postgres` (if it doesn't exist)
-- Create the main database `recipe_generator` (for development)
-- Create the test database `recipe_generator_test` (for integration tests)
+- Create the main database `recipe_generator` (if it doesn't exist)
+- Create the test database `recipe_generator_test` (if it doesn't exist)
+
+**Reset databases** (when migrations break or you need a fresh start):
+```bash
+./reset-local-db.sh
+```
+
+This script will:
+- **⚠️ DROP and recreate both databases (ALL DATA LOST)**
+- Ask for confirmation before proceeding
+- Useful when migration versions conflict
 
 The container uses:
 - User: `recipe_user`

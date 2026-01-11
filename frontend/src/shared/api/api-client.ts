@@ -12,6 +12,31 @@ const axiosInstance = axios.create({
   baseURL: getBaseURL(),
 });
 
+let tokenGetter: (() => Promise<string | null>) | null = null;
+
+export const setAuthTokenGetter = (getter: () => Promise<string | null>) => {
+  tokenGetter = getter;
+};
+
+axiosInstance.interceptors.request.use(
+  async (config) => {
+    if (tokenGetter) {
+      try {
+        const token = await tokenGetter();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (error) {
+        console.error("Failed to get auth token:", error);
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 class APIClient<T> {
   endpoint: string;
 
