@@ -11,7 +11,7 @@ use application::use_cases::{
     CreateShareUseCase, DeleteShareUseCase, GenerateRecipeUseCase, GetRecipeUseCase,
     ListRecipesUseCase, SaveRecipeUseCase,
 };
-use infrastructure::auth::{init_clerk, create_clerk_layer};
+use infrastructure::auth::init_clerk;
 use infrastructure::config::AppConfig;
 use infrastructure::db::create_pool;
 use infrastructure::llm::OpenAiClient;
@@ -63,7 +63,6 @@ async fn main() {
         create_share_use_case,
         delete_share_use_case,
     )
-    .layer(create_clerk_layer())
     .layer(cors);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));

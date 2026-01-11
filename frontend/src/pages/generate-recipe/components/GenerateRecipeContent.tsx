@@ -1,3 +1,4 @@
+import { SignedIn } from "@clerk/clerk-react";
 import { useGenerateRecipe } from "../hooks/useGenerateRecipe";
 import { useSaveRecipe } from "../hooks/useSaveRecipe";
 import IngredientInput from "./IngredientInput";
@@ -37,17 +38,19 @@ export default function GenerateRecipeContent() {
       {data && !isPending && (
         <>
           <RecipeCard recipe={data} />
-          {!data.id && (
-            <div className="pt-4">
-              <PrimaryButton
-                onClick={handleSave}
-                disabled={isSaving || isSaved}
-                className="w-full"
-              >
-                {isSaving ? "Saving..." : isSaved ? "Saved!" : "Save Recipe"}
-              </PrimaryButton>
-            </div>
-          )}
+          <SignedIn>
+            {!data.id && (
+              <div className="pt-4">
+                <PrimaryButton
+                  onClick={handleSave}
+                  disabled={isSaving || isSaved}
+                  className="w-full"
+                >
+                  {isSaving ? "Saving..." : isSaved ? "Saved!" : "Save Recipe"}
+                </PrimaryButton>
+              </div>
+            )}
+          </SignedIn>
         </>
       )}
     </div>

@@ -27,16 +27,18 @@ fn map_repo_error(e: RepositoryError) -> (StatusCode, Json<ErrorResponse>) {
     let (status, message) = match e {
         RepositoryError::NotFound => (StatusCode::NOT_FOUND, "Recipe not found"),
         RepositoryError::AccessDenied => (StatusCode::FORBIDDEN, "Access denied"),
-        RepositoryError::DatabaseError(_) => {
-            (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
-        }
+        RepositoryError::DatabaseError(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Database error"),
     };
-    (status, Json(ErrorResponse { error: message.to_string() }))
+    (
+        status,
+        Json(ErrorResponse {
+            error: message.to_string(),
+        }),
+    )
 }
 
 pub async fn generate_recipe<T: LlmService, R: RecipeRepository, S: RecipeShareRepository>(
     State(state): State<AppState<T, R, S>>,
-    _user: AuthenticatedUser,
     ValidatedJson(request): ValidatedJson<GenerateRecipeRequest>,
 ) -> Result<Json<GeneratedRecipeResponse>, (StatusCode, Json<ErrorResponse>)> {
     let recipe = state

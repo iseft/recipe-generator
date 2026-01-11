@@ -13,8 +13,9 @@ import {
 import { NavLink } from "react-router-dom";
 import { classNames } from "../utils/classNames";
 
-const navigation = [
-  { name: "Generate Recipe", href: "/" },
+const publicNavigation = [{ name: "Generate Recipe", href: "/" }];
+
+const protectedNavigation = [
   { name: "My Recipes", href: "/my-recipes" },
   { name: "Shared with Me", href: "/shared-recipes" },
 ];
@@ -34,7 +35,7 @@ export default function Navigation() {
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                {navigation.map((item) => (
+                {publicNavigation.map((item) => (
                   <NavLink
                     key={item.name}
                     to={item.href}
@@ -51,6 +52,25 @@ export default function Navigation() {
                     {item.name}
                   </NavLink>
                 ))}
+                <SignedIn>
+                  {protectedNavigation.map((item) => (
+                    <NavLink
+                      key={item.name}
+                      to={item.href}
+                      end
+                      className={({ isActive }) =>
+                        classNames(
+                          isActive
+                            ? "bg-gray-900 text-white dark:bg-gray-950/50"
+                            : "text-gray-300 hover:bg-white/5 hover:text-white",
+                          "rounded-md px-3 py-2 text-sm font-medium"
+                        )
+                      }
+                    >
+                      {item.name}
+                    </NavLink>
+                  ))}
+                </SignedIn>
               </div>
             </div>
           </div>
@@ -93,7 +113,7 @@ export default function Navigation() {
 
       <DisclosurePanel className="md:hidden">
         <div className="space-y-1 px-2 pt-2 pb-3 sm:px-3">
-          {navigation.map((item) => (
+          {publicNavigation.map((item) => (
             <NavLink
               key={item.name}
               to={item.href}
@@ -110,6 +130,25 @@ export default function Navigation() {
               {item.name}
             </NavLink>
           ))}
+          <SignedIn>
+            {protectedNavigation.map((item) => (
+              <NavLink
+                key={item.name}
+                to={item.href}
+                end
+                className={({ isActive }) =>
+                  classNames(
+                    isActive
+                      ? "bg-gray-900 text-white dark:bg-gray-950/50"
+                      : "text-gray-300 hover:bg-white/5 hover:text-white",
+                    "block rounded-md px-3 py-2 text-base font-medium"
+                  )
+                }
+              >
+                {item.name}
+              </NavLink>
+            ))}
+          </SignedIn>
         </div>
         <div className="border-t border-white/10 pt-4 pb-3">
           <SignedOut>

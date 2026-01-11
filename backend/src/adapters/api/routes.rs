@@ -10,6 +10,7 @@ use crate::application::use_cases::{
 };
 use crate::domain::repositories::{RecipeRepository, RecipeShareRepository};
 use crate::domain::services::LlmService;
+use crate::infrastructure::auth::create_clerk_layer;
 
 use super::handlers;
 use super::state::AppState;
@@ -39,9 +40,11 @@ pub fn create_router<
         delete_share_use_case,
     };
 
-    Router::new()
+    let public_routes = Router::new()
         .route("/health", get(health))
-        .route("/api/recipes/generate", post(handlers::generate_recipe))
+        .route("/api/recipes/generate", post(handlers::generate_recipe));
+
+    let protected_routes = Router::new()
         .route("/api/recipes/shared", get(handlers::list_shared_recipes))
         .route(
             "/api/recipes",
@@ -53,5 +56,10 @@ pub fn create_router<
             "/api/recipes/{recipe_id}/shares/{user_id}",
             delete(handlers::delete_share),
         )
+        .layer(create_clerk_layer());
+
+    Router::new()
+        .merge(public_routes)
+        .merge(protected_routes)
         .with_state(state)
 }
