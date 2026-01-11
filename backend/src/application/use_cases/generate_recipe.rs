@@ -1,4 +1,4 @@
-use crate::domain::entities::Recipe;
+use crate::domain::entities::GeneratedRecipe;
 use crate::domain::services::{LlmError, LlmService};
 use std::sync::Arc;
 
@@ -15,7 +15,7 @@ impl<T: LlmService> GenerateRecipeUseCase<T> {
         &self,
         ingredients: Vec<String>,
         dietary_restrictions: Option<Vec<String>>,
-    ) -> Result<Recipe, LlmError> {
+    ) -> Result<GeneratedRecipe, LlmError> {
         self.llm_service
             .generate_recipe(ingredients, dietary_restrictions)
             .await

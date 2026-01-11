@@ -1,3 +1,3 @@
 pub mod recipe;
 
-pub use recipe::Recipe;
+pub use recipe::{GeneratedRecipe, Recipe};

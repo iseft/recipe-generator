@@ -1,13 +1,42 @@
-use serde::Deserialize;
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Deserialize)]
-pub struct Recipe {
+pub struct GeneratedRecipe {
     pub title: String,
     pub ingredients: Vec<String>,
     pub instructions: Vec<String>,
-    pub prep_time_minutes: Option<u32>,
-    pub cook_time_minutes: Option<u32>,
-    pub servings: Option<u32>,
+    pub prep_time_minutes: Option<i32>,
+    pub cook_time_minutes: Option<i32>,
+    pub servings: Option<i32>,
+}
+
+#[derive(Debug, Clone, Serialize, sqlx::FromRow)]
+pub struct Recipe {
+    pub id: Uuid,
+    pub title: String,
+    pub ingredients: Vec<String>,
+    pub instructions: Vec<String>,
+    pub prep_time_minutes: Option<i32>,
+    pub cook_time_minutes: Option<i32>,
+    pub servings: Option<i32>,
+    pub created_at: DateTime<Utc>,
+}
+
+impl Recipe {
+    pub fn from_generated(generated: GeneratedRecipe) -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            title: generated.title,
+            ingredients: generated.ingredients,
+            instructions: generated.instructions,
+            prep_time_minutes: generated.prep_time_minutes,
+            cook_time_minutes: generated.cook_time_minutes,
+            servings: generated.servings,
+            created_at: Utc::now(),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -15,7 +44,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parses_complete_recipe_json() {
+    fn parses_complete_generated_recipe_json() {
         let json = r#"{
             "title": "Garlic Chicken",
             "ingredients": ["chicken", "garlic"],
@@ -25,7 +54,7 @@ mod tests {
             "servings": 4
         }"#;
 
-        let recipe: Recipe = serde_json::from_str(json).unwrap();
+        let recipe: GeneratedRecipe = serde_json::from_str(json).unwrap();
 
         assert_eq!(recipe.title, "Garlic Chicken");
         assert_eq!(recipe.ingredients.len(), 2);
@@ -36,14 +65,14 @@ mod tests {
     }
 
     #[test]
-    fn parses_recipe_with_optional_fields_missing() {
+    fn parses_generated_recipe_with_optional_fields_missing() {
         let json = r#"{
             "title": "Simple Dish",
             "ingredients": ["salt"],
             "instructions": ["add salt"]
         }"#;
 
-        let recipe: Recipe = serde_json::from_str(json).unwrap();
+        let recipe: GeneratedRecipe = serde_json::from_str(json).unwrap();
 
         assert_eq!(recipe.title, "Simple Dish");
         assert!(recipe.prep_time_minutes.is_none());
@@ -55,8 +84,25 @@ mod tests {
     fn fails_on_missing_required_fields() {
         let json = r#"{"title": "No Ingredients"}"#;
 
-        let result: Result<Recipe, _> = serde_json::from_str(json);
+        let result: Result<GeneratedRecipe, _> = serde_json::from_str(json);
 
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn converts_generated_to_recipe() {
+        let generated = GeneratedRecipe {
+            title: "Test".to_string(),
+            ingredients: vec!["a".to_string()],
+            instructions: vec!["b".to_string()],
+            prep_time_minutes: Some(5),
+            cook_time_minutes: Some(10),
+            servings: Some(2),
+        };
+
+        let recipe = Recipe::from_generated(generated);
+
+        assert_eq!(recipe.title, "Test");
+        assert!(!recipe.id.is_nil());
     }
 }

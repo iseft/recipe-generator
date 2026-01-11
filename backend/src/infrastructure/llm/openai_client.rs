@@ -1,4 +1,4 @@
-use crate::domain::entities::Recipe;
+use crate::domain::entities::GeneratedRecipe;
 use crate::domain::services::{LlmError, LlmService};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
@@ -87,7 +87,7 @@ impl LlmService for OpenAiClient {
         &self,
         ingredients: Vec<String>,
         dietary_restrictions: Option<Vec<String>>,
-    ) -> Result<Recipe, LlmError> {
+    ) -> Result<GeneratedRecipe, LlmError> {
         let prompt = Self::build_prompt(&ingredients, &dietary_restrictions);
 
         let request = ChatRequest {

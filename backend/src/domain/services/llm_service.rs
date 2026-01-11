@@ -1,4 +1,4 @@
-use crate::domain::entities::Recipe;
+use crate::domain::entities::GeneratedRecipe;
 use std::future::Future;
 
 pub trait LlmService: Send + Sync {
@@ -6,7 +6,7 @@ pub trait LlmService: Send + Sync {
         &self,
         ingredients: Vec<String>,
         dietary_restrictions: Option<Vec<String>>,
-    ) -> impl Future<Output = Result<Recipe, LlmError>> + Send;
+    ) -> impl Future<Output = Result<GeneratedRecipe, LlmError>> + Send;
 }
 
 #[derive(Debug)]
