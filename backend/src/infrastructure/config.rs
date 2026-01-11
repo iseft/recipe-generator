@@ -2,6 +2,7 @@ pub struct AppConfig {
     pub port: u16,
     pub openai_api_key: String,
     pub cors_origin: String,
+    pub database_url: String,
 }
 
 impl AppConfig {
@@ -14,6 +15,7 @@ impl AppConfig {
             openai_api_key: std::env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set"),
             cors_origin: std::env::var("CORS_ORIGIN")
                 .unwrap_or_else(|_| "http://localhost:5173".to_string()),
+            database_url: std::env::var("DATABASE_URL").expect("DATABASE_URL must be set"),
         }
     }
 }

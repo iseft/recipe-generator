@@ -9,6 +9,7 @@ use std::sync::Arc;
 use adapters::api::routes::create_router;
 use application::use_cases::GenerateRecipeUseCase;
 use infrastructure::config::AppConfig;
+use infrastructure::db::create_pool;
 use infrastructure::llm::OpenAiClient;
 use tower_http::cors::{Any, CorsLayer};
 
@@ -17,6 +18,8 @@ async fn main() {
     dotenvy::dotenv().ok();
 
     let config = AppConfig::from_env();
+
+    let db_pool = create_pool(&config.database_url).await;
 
     let llm_client = Arc::new(OpenAiClient::new(config.openai_api_key));
     let use_case = Arc::new(GenerateRecipeUseCase::new(llm_client));
