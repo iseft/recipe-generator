@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
 import { useRecipe } from "../../hooks/useRecipe";
 import RecipeCard from "../../../../shared/components/recipe/RecipeCard";
 import LoadingState from "../../../../shared/components/ui/LoadingState";
 import ErrorState from "../../../../shared/components/ui/ErrorState";
+import Breadcrumbs from "../../../../shared/components/ui/Breadcrumbs";
 
 interface RecipeDetailContentProps {
   id: string | undefined;
@@ -36,12 +36,12 @@ export default function RecipeDetailContent({ id }: RecipeDetailContentProps) {
 
   return (
     <div className="space-y-6">
-      <Link
-        to="/recipes"
-        className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
-      >
-        ← Back to Saved Recipes
-      </Link>
+      <Breadcrumbs
+        items={[
+          { name: "Saved Recipes", href: "/recipes" },
+          { name: recipe.title, href: `/recipes/${recipe.id}`, current: true },
+        ]}
+      />
       <RecipeCard recipe={recipe} />
     </div>
   );
