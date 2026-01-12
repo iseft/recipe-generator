@@ -1,10 +1,10 @@
 import { Route } from "react-router-dom";
 import AppShell from "../shared/components/AppShell";
 import ProtectedRoute from "../shared/components/ProtectedRoute";
-import MyRecipesPage from "../pages/my-recipes";
-import MyRecipeDetailPage from "../pages/my-recipes/recipe-detail";
-import SharedRecipesPage from "../pages/shared-recipes";
-import SharedRecipeDetailPage from "../pages/shared-recipes/recipe-detail";
+import MyRecipesPage from "../views/recipes/my-recipes";
+import MyRecipeDetailPage from "../views/recipes/my-recipes/recipe-detail";
+import SharedRecipesPage from "../views/recipes/shared-recipes";
+import SharedRecipeDetailPage from "../views/recipes/shared-recipes/recipe-detail";
 
 export function ProtectedRoutes() {
   return [

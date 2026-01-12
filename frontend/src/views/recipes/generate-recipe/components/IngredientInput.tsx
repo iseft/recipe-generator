@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import PrimaryButton from "../../../shared/components/ui/PrimaryButton";
-import Input from "../../../shared/components/ui/Input";
+import PrimaryButton from "../../../../shared/components/ui/PrimaryButton";
+import Input from "../../../../shared/components/ui/Input";
 import {
   generateRecipeFormSchema,
   type GenerateRecipeFormData,

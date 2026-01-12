@@ -1,6 +1,6 @@
-import RecipeCard from "../../../../shared/components/recipe/RecipeCard";
-import LoadingState from "../../../../shared/components/ui/LoadingState";
-import ErrorState from "../../../../shared/components/ui/ErrorState";
+import RecipeCard from "../../../../../shared/components/recipe/RecipeCard";
+import LoadingState from "../../../../../shared/components/ui/LoadingState";
+import ErrorState from "../../../../../shared/components/ui/ErrorState";
 import type { Recipe } from "../../../generate-recipe/types";
 
 interface SharedRecipeDetailContentProps {

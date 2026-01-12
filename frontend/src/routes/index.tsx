@@ -2,8 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import AppShell from "../shared/components/AppShell";
 import { PublicRoutes } from "./PublicRoutes";
 import { ProtectedRoutes } from "./ProtectedRoutes";
-import GenerateRecipePage from "../pages/generate-recipe";
-import NotFoundPage from "../pages/NotFoundPage";
+import GenerateRecipePage from "../views/recipes/generate-recipe";
+import NotFoundPage from "../views/not-found/NotFoundPage";
 
 export function AppRoutes() {
   return (

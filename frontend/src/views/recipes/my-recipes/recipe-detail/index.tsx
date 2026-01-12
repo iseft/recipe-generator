@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
-import PageLayout from "../../../shared/components/PageLayout";
+import PageLayout from "../../../../shared/components/PageLayout";
 import MyRecipeDetailContent from "./components/MyRecipeDetailContent";
-import { useRecipe } from "../../../shared/hooks/useRecipe";
+import { useRecipe } from "../../../../shared/hooks/useRecipe";
 
 export default function MyRecipeDetailPage() {
   const { id } = useParams<{ id: string }>();

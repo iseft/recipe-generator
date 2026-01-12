@@ -1,4 +1,4 @@
-import PageLayout from "../../shared/components/PageLayout";
+import PageLayout from "../../../shared/components/PageLayout";
 import MyRecipesContent from "./components/MyRecipesContent";
 
 export default function MyRecipesPage() {

@@ -1,6 +1,6 @@
 import { Route } from "react-router-dom";
-import SignInPage from "../pages/auth/SignInPage";
-import SignUpPage from "../pages/auth/SignUpPage";
+import SignInPage from "../views/auth/SignInPage";
+import SignUpPage from "../views/auth/SignUpPage";
 
 export function PublicRoutes() {
   return [

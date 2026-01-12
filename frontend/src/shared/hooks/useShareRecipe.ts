@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { recipesClient } from "../../pages/generate-recipe/api";
+import { recipesClient } from "../../views/recipes/generate-recipe/api";
 
 interface ShareRecipeData {
   email: string;

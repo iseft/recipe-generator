@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { parseCommaSeparated } from "../../shared/utils/parseCommaSeparated";
+import { parseCommaSeparated } from "../../../shared/utils/parseCommaSeparated";
 
 export const generateRecipeFormSchema = z.object({
   ingredients: z

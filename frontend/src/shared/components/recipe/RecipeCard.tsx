@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import CardWithHeader from "../ui/CardWithHeader";
 import ShareRecipeButton from "./ShareRecipeButton";
-import type { Recipe } from "../../../pages/generate-recipe/types";
+import type { Recipe } from "../../../views/recipes/generate-recipe/types";
 
 interface RecipeCardProps {
   recipe: Recipe;

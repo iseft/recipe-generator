@@ -1,7 +1,7 @@
 import { useSharedRecipes } from "../hooks/useSharedRecipes";
-import RecipeCard from "../../../shared/components/recipe/RecipeCard";
-import LoadingState from "../../../shared/components/ui/LoadingState";
-import ErrorState from "../../../shared/components/ui/ErrorState";
+import RecipeCard from "../../../../shared/components/recipe/RecipeCard";
+import LoadingState from "../../../../shared/components/ui/LoadingState";
+import ErrorState from "../../../../shared/components/ui/ErrorState";
 
 export default function SharedRecipesContent() {
   const { data: recipes, isLoading, error } = useSharedRecipes();
@@ -32,9 +32,9 @@ export default function SharedRecipesContent() {
   return (
     <div className="space-y-6">
       {recipesArray.map((recipe) => (
-        <RecipeCard 
-          key={recipe.id} 
-          recipe={recipe} 
+        <RecipeCard
+          key={recipe.id}
+          recipe={recipe}
           linkTo={`/shared-recipes/${recipe.id}`}
           showSharedBy={true}
         />
