@@ -4,9 +4,12 @@ use axum::{
     http::StatusCode,
 };
 use serde::Serialize;
+use utoipa::ToSchema;
 use uuid::Uuid;
 
-use crate::recipes::domain::{LlmError, LlmService, Recipe, RecipeRepository, RecipeShareRepository, RepositoryError};
+use crate::recipes::domain::{
+    LlmError, LlmService, Recipe, RecipeRepository, RecipeShareRepository, RepositoryError,
+};
 use crate::shared::auth::AuthenticatedUser;
 
 use super::dto::{
@@ -16,7 +19,7 @@ use super::dto::{
 use super::extractors::ValidatedJson;
 use super::state::AppState;
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct ErrorResponse {
     pub error: String,
 }
@@ -67,6 +70,19 @@ fn map_auth_lookup_error(e: String) -> (StatusCode, Json<ErrorResponse>) {
     )
 }
 
+#[utoipa::path(
+    post,
+    path = "/api/recipes/generate",
+    summary = "Generate a recipe using AI",
+    description = "Generates a recipe based on provided ingredients and optional dietary restrictions. Uses AI to create a complete recipe with instructions, prep time, cook time, and serving size.",
+    request_body = GenerateRecipeRequest,
+    responses(
+        (status = 200, description = "Recipe generated successfully", body = GeneratedRecipeResponse),
+        (status = 400, description = "Invalid request - ingredients list is empty or invalid", body = ErrorResponse),
+        (status = 502, description = "AI service error - failed to reach or process AI service", body = ErrorResponse),
+    ),
+    tag = "Recipes"
+)]
 pub async fn generate_recipe<T: LlmService, R: RecipeRepository, S: RecipeShareRepository>(
     State(state): State<AppState<T, R, S>>,
     ValidatedJson(request): ValidatedJson<GenerateRecipeRequest>,
@@ -80,6 +96,23 @@ pub async fn generate_recipe<T: LlmService, R: RecipeRepository, S: RecipeShareR
     Ok(Json(recipe.into()))
 }
 
+#[utoipa::path(
+    post,
+    path = "/api/recipes",
+    summary = "Save a recipe",
+    description = "Saves a recipe to the user's collection. The recipe will be associated with the authenticated user and visible in 'My Recipes'.",
+    request_body = SaveRecipeRequest,
+    responses(
+        (status = 200, description = "Recipe saved successfully", body = RecipeResponse),
+        (status = 400, description = "Invalid request - missing required fields or invalid data", body = ErrorResponse),
+        (status = 401, description = "Unauthorized - authentication token missing or invalid"),
+        (status = 500, description = "Database error - failed to save recipe", body = ErrorResponse),
+    ),
+    security(
+        ("bearer_auth" = [])
+    ),
+    tag = "Recipes"
+)]
 pub async fn save_recipe<T: LlmService, R: RecipeRepository, S: RecipeShareRepository>(
     State(state): State<AppState<T, R, S>>,
     user: AuthenticatedUser,
@@ -96,6 +129,25 @@ pub async fn save_recipe<T: LlmService, R: RecipeRepository, S: RecipeShareRepos
     Ok(Json(recipe.into()))
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/recipes/{id}",
+    summary = "Get a recipe by ID",
+    description = "Retrieves a recipe by its ID. The user must be the owner of the recipe or have the recipe shared with them.",
+    params(
+        ("id" = Uuid, Path, description = "Recipe UUID")
+    ),
+    responses(
+        (status = 200, description = "Recipe retrieved successfully", body = RecipeResponse),
+        (status = 401, description = "Unauthorized - authentication token missing or invalid"),
+        (status = 403, description = "Access denied - user does not have permission to view this recipe", body = ErrorResponse),
+        (status = 404, description = "Recipe not found", body = ErrorResponse),
+    ),
+    security(
+        ("bearer_auth" = [])
+    ),
+    tag = "Recipes"
+)]
 pub async fn get_recipe<T: LlmService, R: RecipeRepository, S: RecipeShareRepository>(
     State(state): State<AppState<T, R, S>>,
     user: AuthenticatedUser,
@@ -110,8 +162,7 @@ pub async fn get_recipe<T: LlmService, R: RecipeRepository, S: RecipeShareReposi
     let mut response: RecipeResponse = recipe.into();
 
     if response.owner_id != user.user_id {
-        if let Ok(Some(email)) =
-            crate::shared::auth::get_user_email_by_id(&response.owner_id).await
+        if let Ok(Some(email)) = crate::shared::auth::get_user_email_by_id(&response.owner_id).await
         {
             response = response.with_owner_email(Some(email));
         }
@@ -120,6 +171,21 @@ pub async fn get_recipe<T: LlmService, R: RecipeRepository, S: RecipeShareReposi
     Ok(Json(response))
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/recipes",
+    summary = "List user's recipes",
+    description = "Returns all recipes owned by the authenticated user, ordered by creation date (newest first).",
+    responses(
+        (status = 200, description = "List of user's recipes", body = [RecipeResponse]),
+        (status = 401, description = "Unauthorized - authentication token missing or invalid"),
+        (status = 500, description = "Database error - failed to retrieve recipes", body = ErrorResponse),
+    ),
+    security(
+        ("bearer_auth" = [])
+    ),
+    tag = "Recipes"
+)]
 pub async fn list_my_recipes<T: LlmService, R: RecipeRepository, S: RecipeShareRepository>(
     State(state): State<AppState<T, R, S>>,
     user: AuthenticatedUser,
@@ -133,6 +199,21 @@ pub async fn list_my_recipes<T: LlmService, R: RecipeRepository, S: RecipeShareR
     Ok(Json(recipes.into_iter().map(|r| r.into()).collect()))
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/recipes/shared",
+    summary = "List recipes shared with user",
+    description = "Returns all recipes that have been shared with the authenticated user by other users, ordered by share date (newest first).",
+    responses(
+        (status = 200, description = "List of recipes shared with user", body = [RecipeResponse]),
+        (status = 401, description = "Unauthorized - authentication token missing or invalid"),
+        (status = 500, description = "Database error - failed to retrieve shared recipes", body = ErrorResponse),
+    ),
+    security(
+        ("bearer_auth" = [])
+    ),
+    tag = "Recipes"
+)]
 pub async fn list_shared_recipes<T: LlmService, R: RecipeRepository, S: RecipeShareRepository>(
     State(state): State<AppState<T, R, S>>,
     user: AuthenticatedUser,
@@ -146,8 +227,7 @@ pub async fn list_shared_recipes<T: LlmService, R: RecipeRepository, S: RecipeSh
     let mut responses: Vec<RecipeResponse> = Vec::new();
     for recipe in recipes {
         let mut response: RecipeResponse = recipe.into();
-        if let Ok(Some(email)) =
-            crate::shared::auth::get_user_email_by_id(&response.owner_id).await
+        if let Ok(Some(email)) = crate::shared::auth::get_user_email_by_id(&response.owner_id).await
         {
             response = response.with_owner_email(Some(email));
         }
@@ -157,6 +237,28 @@ pub async fn list_shared_recipes<T: LlmService, R: RecipeRepository, S: RecipeSh
     Ok(Json(responses))
 }
 
+#[utoipa::path(
+    post,
+    path = "/api/recipes/{id}/shares",
+    summary = "Share a recipe with another user",
+    description = "Shares a recipe with another user by their email address. Only the recipe owner can share their recipes.",
+    params(
+        ("id" = Uuid, Path, description = "Recipe UUID")
+    ),
+    request_body = CreateShareRequest,
+    responses(
+        (status = 201, description = "Recipe shared successfully"),
+        (status = 400, description = "Invalid request - invalid email format", body = ErrorResponse),
+        (status = 401, description = "Unauthorized - authentication token missing or invalid"),
+        (status = 403, description = "Access denied - user is not the owner of this recipe", body = ErrorResponse),
+        (status = 404, description = "Recipe or user not found - recipe doesn't exist or user with email not found", body = ErrorResponse),
+        (status = 500, description = "Database error - failed to create share", body = ErrorResponse),
+    ),
+    security(
+        ("bearer_auth" = [])
+    ),
+    tag = "Sharing"
+)]
 pub async fn create_share<T: LlmService, R: RecipeRepository, S: RecipeShareRepository>(
     State(state): State<AppState<T, R, S>>,
     user: AuthenticatedUser,
@@ -184,6 +286,27 @@ pub async fn create_share<T: LlmService, R: RecipeRepository, S: RecipeShareRepo
     Ok(StatusCode::CREATED)
 }
 
+#[utoipa::path(
+    delete,
+    path = "/api/recipes/{recipe_id}/shares/{user_id}",
+    summary = "Unshare a recipe",
+    description = "Removes sharing access for a specific user. Only the recipe owner can unshare their recipes.",
+    params(
+        ("recipe_id" = Uuid, Path, description = "Recipe UUID"),
+        ("user_id" = String, Path, description = "User ID to remove sharing access from")
+    ),
+    responses(
+        (status = 204, description = "Share removed successfully"),
+        (status = 401, description = "Unauthorized - authentication token missing or invalid"),
+        (status = 403, description = "Access denied - user is not the owner of this recipe", body = ErrorResponse),
+        (status = 404, description = "Share not found - recipe is not shared with this user", body = ErrorResponse),
+        (status = 500, description = "Database error - failed to remove share", body = ErrorResponse),
+    ),
+    security(
+        ("bearer_auth" = [])
+    ),
+    tag = "Sharing"
+)]
 pub async fn delete_share<T: LlmService, R: RecipeRepository, S: RecipeShareRepository>(
     State(state): State<AppState<T, R, S>>,
     user: AuthenticatedUser,

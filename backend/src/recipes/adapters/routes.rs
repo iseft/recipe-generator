@@ -3,6 +3,8 @@ use axum::{
     routing::{delete, get, post},
 };
 use std::sync::Arc;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
 use crate::recipes::application::{
     CreateShareUseCase, DeleteShareUseCase, GenerateRecipeUseCase, GetRecipeUseCase,
@@ -12,6 +14,7 @@ use crate::recipes::domain::{LlmService, RecipeRepository, RecipeShareRepository
 use crate::shared::auth::create_clerk_layer;
 
 use super::handlers;
+use super::openapi::ApiDoc;
 use super::state::AppState;
 
 async fn health() -> &'static str {
@@ -59,8 +62,10 @@ pub fn create_router<
         )
         .layer(create_clerk_layer());
 
-    Router::new()
-        .merge(public_routes)
+    let openapi = ApiDoc::openapi();
+
+    public_routes
         .merge(protected_routes)
+        .merge(SwaggerUi::new("/swagger-ui").url("/api-doc/openapi.json", openapi))
         .with_state(state)
 }
