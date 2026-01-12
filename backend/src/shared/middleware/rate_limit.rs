@@ -1,6 +1,7 @@
 use axum::extract::ConnectInfo;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
+use axum::Router;
 use dashmap::DashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -42,7 +43,7 @@ impl RateLimiter {
         Ok(())
     }
 
-    pub fn get_client_ip(
+    fn get_client_ip(
         headers: &HeaderMap,
         connect_info: Option<&ConnectInfo<SocketAddr>>,
     ) -> String {
@@ -68,7 +69,7 @@ impl RateLimiter {
     }
 }
 
-pub async fn rate_limit_middleware(
+async fn rate_limit_middleware(
     axum::extract::State(rate_limiter): axum::extract::State<RateLimiter>,
     req: axum::extract::Request,
     next: axum::middleware::Next,
@@ -85,4 +86,26 @@ pub async fn rate_limit_middleware(
         )
             .into_response(),
     }
+}
+
+pub fn create_rate_limiter(max_requests: u32, window_seconds: u64) -> RateLimiter {
+    let rate_limiter = RateLimiter::new(max_requests, window_seconds);
+
+    tracing::info!(
+        "Rate limiting configured: {} requests per {} seconds per IP address",
+        max_requests,
+        window_seconds
+    );
+
+    rate_limiter
+}
+
+pub fn apply_rate_limit<S>(router: Router<S>, rate_limiter: RateLimiter) -> Router<S>
+where
+    S: Clone + Send + Sync + 'static,
+{
+    router.layer(axum::middleware::from_fn_with_state(
+        rate_limiter.clone(),
+        rate_limit_middleware,
+    ))
 }
