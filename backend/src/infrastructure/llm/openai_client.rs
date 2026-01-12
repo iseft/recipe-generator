@@ -26,10 +26,10 @@ impl OpenAiClient {
     ///    consistent field names and types across all responses, making parsing reliable.
     /// 3. **Dietary restrictions inline**: Placed directly in the prompt context so the model
     ///    considers them when selecting ingredients and cooking methods.
-    /// 4. **Ingredients as comma-separated list**: Simple format that's easy for the model to parse
-    ///    and doesn't introduce ambiguity.
-    /// 5. **Optional fields with example values**: Showing numeric examples (10, 20, 4) guides the
-    ///    model to return integers rather than strings like "10 minutes".
+    /// 4. **Use only listed ingredients**: The model must use primarily the provided ingredients,
+    ///    with only basic kitchen staples (salt, pepper, herbs, sugar, etc.) allowed.
+    /// 5. **LLM determines times and servings**: The model should calculate realistic prep_time_minutes,
+    ///    cook_time_minutes, and servings based on the recipe complexity and yield.
     fn build_prompt(ingredients: &[String], dietary_restrictions: &Option<Vec<String>>) -> String {
         let restrictions = dietary_restrictions
             .as_ref()
@@ -37,17 +37,20 @@ impl OpenAiClient {
             .unwrap_or_default();
 
         format!(
-            r#"Generate a recipe using these ingredients: {}.
-{}
+            r#"Generate a recipe using ONLY these ingredients: {}.
+You may also use basic kitchen staples that are commonly available such as salt, pepper, herbs, spices, sugar, oil, butter, or water. Do not add ingredients that are not in this list.
 
-Respond with valid JSON only, no markdown, in this exact format:
+{}
+IMPORTANT: Calculate realistic prep_time_minutes, cook_time_minutes, and servings based on the actual recipe you create. These should be integers that reflect the real complexity, cooking time, and yield of your recipe.
+
+Respond with valid JSON only, no markdown, in this exact format (the numbers shown are examples - calculate appropriate values for your recipe):
 {{
   "title": "Recipe Name",
   "ingredients": ["ingredient 1 with amount", "ingredient 2 with amount"],
   "instructions": ["step 1", "step 2"],
-  "prep_time_minutes": 10,
-  "cook_time_minutes": 20,
-  "servings": 4
+  "prep_time_minutes": 0,
+  "cook_time_minutes": 0,
+  "servings": 0
 }}"#,
             ingredients.join(", "),
             restrictions
