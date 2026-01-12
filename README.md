@@ -4,17 +4,21 @@ A web application that generates recipes using AI based on ingredients you have 
 
 ## Architecture
 
-This project uses **Clean Architecture** with four layers:
+This project uses **Domain-Driven Design (DDD)** with **Clean Architecture** principles, organized by feature modules:
 
 ```
 backend/src/
-├── domain/          # Core business entities and traits (innermost)
-├── application/     # Use cases and business logic
-├── adapters/        # HTTP handlers, DTOs, routes
-└── infrastructure/  # External services (OpenAI), config, database
+├── recipes/         # Recipes feature module (bounded context)
+│   ├── adapters/    # HTTP handlers, DTOs, routes
+│   ├── application/ # Use cases and business logic
+│   ├── domain/      # Core business entities and traits
+│   └── infrastructure/ # Concrete implementations (repos, LLM client)
+└── shared/          # Cross-cutting concerns (auth, config, db)
 ```
 
 **Dependency flow:** Infrastructure → Adapters → Application → Domain
+
+Each feature module follows Clean Architecture layers, making it easy to add new features (e.g., `users/`, `notifications/`) alongside `recipes/`.
 
 ## Tech Stack
 
@@ -232,7 +236,9 @@ This application uses [Clerk](https://clerk.com) for authentication.
 3. Copy the **Secret Key** → set as `CLERK_SECRET_KEY` in your `.env` file
 4. Copy the **Publishable Key** → set as `VITE_CLERK_PUBLISHABLE_KEY` in your `.env` file
 
-That's it! No additional configuration needed. The app uses Clerk's React components which handle authentication automatically, and the backend verifies JWT tokens from the frontend.
+### How It Works
+
+The app uses Clerk's React components which handle authentication automatically. The backend verifies JWT tokens from the frontend using Clerk's JWT verification library.
 
 ### Example .env File
 
