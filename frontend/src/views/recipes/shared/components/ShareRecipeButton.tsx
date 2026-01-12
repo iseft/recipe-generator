@@ -19,12 +19,11 @@ export default function ShareRecipeButton({ recipeId }: ShareButtonProps) {
         <ShareIcon className="h-5 w-5" />
       </button>
 
-      {showShareModal && (
-        <ShareRecipeModal
-          recipeId={recipeId}
-          onClose={() => setShowShareModal(false)}
-        />
-      )}
+      <ShareRecipeModal
+        recipeId={recipeId}
+        open={showShareModal}
+        onClose={() => setShowShareModal(false)}
+      />
     </>
   );
 }

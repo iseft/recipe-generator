@@ -28,8 +28,6 @@ export default function MyRecipeDetailContent({
   }
 
   return (
-    <div className="space-y-6">
-      <RecipeCard recipe={recipe} showShareButton={true} />
-    </div>
+    <RecipeCard recipe={recipe} showShareButton={true} showFooter={true} />
   );
 }

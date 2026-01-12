@@ -13,6 +13,9 @@ export function useShareRecipe(recipeId: string) {
       recipesClient.post(data, `${recipeId}/shares`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recipe", recipeId] });
+      queryClient.invalidateQueries({
+        queryKey: ["recipe", recipeId, "shares"],
+      });
     },
   });
 }
