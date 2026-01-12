@@ -13,13 +13,22 @@ use recipes::infrastructure::{OpenAiClient, PgRecipeRepository, PgRecipeShareRep
 use shared::auth::init_clerk;
 use shared::config::AppConfig;
 use shared::db::create_pool;
+use shared::rate_limit::{RateLimiter, rate_limit_middleware};
 use tower_http::cors::{Any, CorsLayer};
+use tower_http::trace::TraceLayer;
+use tracing_subscriber;
 
 #[tokio::main]
 async fn main() {
     dotenvy::from_filename("../.env")
         .or_else(|_| dotenvy::dotenv())
         .ok();
+
+    tracing_subscriber::fmt()
+        .with_target(false)
+        .with_thread_ids(true)
+        .with_level(true)
+        .init();
 
     let config = AppConfig::from_env();
 
@@ -58,6 +67,40 @@ async fn main() {
         .allow_methods(Any)
         .allow_headers(Any);
 
+    let trace_layer = TraceLayer::new_for_http()
+        .make_span_with(|request: &axum::http::Request<_>| {
+            tracing::info_span!(
+                "http_request",
+                method = %request.method(),
+                uri = %request.uri(),
+                version = ?request.version(),
+            )
+        })
+        .on_request(|_request: &axum::http::Request<_>, _span: &tracing::Span| {
+            tracing::info!("Incoming request");
+        })
+        .on_response(
+            |_response: &axum::http::Response<_>,
+             latency: std::time::Duration,
+             _span: &tracing::Span| {
+                tracing::info!(
+                    status = %_response.status(),
+                    latency_ms = latency.as_millis(),
+                    "Request completed"
+                );
+            },
+        )
+        .on_failure(
+            |_error: tower_http::classify::ServerErrorsFailureClass,
+             _latency: std::time::Duration,
+             _span: &tracing::Span| {
+                tracing::error!("Request failed");
+            },
+        );
+
+    let rate_limiter =
+        RateLimiter::new(config.rate_limit_requests, config.rate_limit_duration_secs);
+
     let app = create_router(
         generate_use_case,
         save_use_case,
@@ -68,7 +111,18 @@ async fn main() {
         create_share_use_case,
         delete_share_use_case,
     )
+    .layer(axum::middleware::from_fn_with_state(
+        rate_limiter.clone(),
+        rate_limit_middleware,
+    ))
+    .layer(trace_layer)
     .layer(cors);
+
+    tracing::info!(
+        "Rate limiting configured: {} requests per {} seconds per IP address",
+        config.rate_limit_requests,
+        config.rate_limit_duration_secs
+    );
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
     println!("Server running on http://localhost:{}", config.port);

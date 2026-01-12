@@ -4,6 +4,8 @@ pub struct AppConfig {
     pub cors_origin: String,
     pub database_url: String,
     pub clerk_secret_key: String,
+    pub rate_limit_requests: u32,
+    pub rate_limit_duration_secs: u64,
 }
 
 impl AppConfig {
@@ -27,6 +29,14 @@ impl AppConfig {
             database_url,
             clerk_secret_key: std::env::var("CLERK_SECRET_KEY")
                 .expect("CLERK_SECRET_KEY must be set"),
+            rate_limit_requests: std::env::var("RATE_LIMIT_REQUESTS")
+                .unwrap_or_else(|_| "100".to_string())
+                .parse()
+                .unwrap_or(100),
+            rate_limit_duration_secs: std::env::var("RATE_LIMIT_DURATION_SECS")
+                .unwrap_or_else(|_| "60".to_string())
+                .parse()
+                .unwrap_or(60),
         }
     }
 }
