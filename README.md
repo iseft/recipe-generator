@@ -136,6 +136,24 @@ cd backend
 cargo test
 ```
 
+### Format & Lint Checks
+
+```bash
+# Format check (backend)
+cd backend && cargo fmt --check
+
+# Lint check (backend)
+cd backend && cargo clippy -- -D warnings
+
+# Lint check (frontend)
+cd frontend && npm run lint
+
+# Run all checks from root
+npm run format  # Format check
+npm run lint    # Lint check
+npm run test    # Run all tests
+```
+
 ## API Endpoints
 
 | Method | Endpoint | Description |
@@ -145,6 +163,18 @@ cargo test
 | POST | `/api/recipes` | Save a generated recipe |
 | GET | `/api/recipes` | List all saved recipes |
 | GET | `/api/recipes/:id` | Get a single recipe |
+| GET | `/api/recipes/shared` | List recipes shared with the user |
+| POST | `/api/recipes/:id/shares` | Share a recipe with a user |
+| DELETE | `/api/recipes/:recipe_id/shares/:user_id` | Remove a share |
+| GET | `/api/recipes/:id/shares` | List users a recipe is shared with |
+
+### OpenAPI/Swagger Documentation
+
+Interactive API documentation is available at:
+- **Swagger UI**: http://localhost:3000/swagger-ui
+- **OpenAPI JSON**: http://localhost:3000/api-doc/openapi.json
+
+The Swagger UI provides an interactive interface to explore all endpoints, view request/response schemas, and test API calls directly from the browser.
 
 ### Generate Recipe
 
@@ -261,6 +291,18 @@ VITE_CLERK_PUBLISHABLE_KEY=pk_test_your-clerk-publishable-key
 PORT=3000
 CORS_ORIGIN=http://localhost:5173
 ```
+
+## AI Tools Usage
+
+This project was developed with the assistance of AI tools (specifically Cursor's AI coding assistant) to accelerate development and ensure best practices. AI was used for:
+
+- **Code generation**: Initial scaffolding of components, handlers, and database models
+- **Refactoring assistance**: Help with architectural decisions (DDD structure, Clean Architecture patterns)
+- **Error resolution**: Debugging compilation errors and type mismatches
+- **Documentation**: Generating README sections and code comments
+- **Code review**: Suggestions for improvements and consistency
+
+All AI-generated code was reviewed, tested, and integrated manually. The final codebase reflects deliberate architectural choices and follows Rust/TypeScript best practices.
 
 ## Security Considerations
 

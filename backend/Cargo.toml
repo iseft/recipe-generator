@@ -30,3 +30,4 @@ validator = { version = "0.20.0", features = ["derive"] }
 
 [dev-dependencies]
 tokio-test = "0.4.5"
+tower = "0.5"

@@ -11,7 +11,16 @@
     "build:start": "npm run build && npm start",
     "start": "concurrently -n backend,frontend -c blue,green \"npm run start:backend\" \"npm run start:frontend\"",
     "start:backend": "cd backend && ./target/release/backend",
-    "start:frontend": "cd frontend && npm run preview"
+    "start:frontend": "cd frontend && npm run preview",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && cargo test",
+    "test:frontend": "cd frontend && npm run lint",
+    "format": "npm run format:backend && npm run format:frontend",
+    "format:backend": "cd backend && cargo fmt --check",
+    "format:frontend": "cd frontend && npm run lint",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && cargo clippy -- -D warnings",
+    "lint:frontend": "cd frontend && npm run lint"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"
