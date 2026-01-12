@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { recipesClient } from "../../views/recipes/generate-recipe/api";
-import type { Recipe } from "../../views/recipes/generate-recipe/types";
+import { recipesClient } from "../../generate-recipe/api";
+import type { Recipe } from "../../generate-recipe/types";
 
 export function useRecipe(id: string | undefined) {
   return useQuery<Recipe>({

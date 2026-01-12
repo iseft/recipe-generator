@@ -1,6 +1,6 @@
 import { Route } from "react-router-dom";
 import AppShell from "../shared/components/AppShell";
-import ProtectedRoute from "../shared/components/ProtectedRoute";
+import ProtectedRoute from "./ProtectedRoute";
 import MyRecipesPage from "../views/recipes/my-recipes";
 import MyRecipeDetailPage from "../views/recipes/my-recipes/recipe-detail";
 import SharedRecipesPage from "../views/recipes/shared-recipes";
