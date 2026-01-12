@@ -1,5 +1,6 @@
 import PageLayout from "../../../shared/components/PageLayout";
 import SharedRecipesContent from "./components/SharedRecipesContent";
+import { recipeNavigation } from "../shared/navigation";
 
 export default function SharedRecipesPage() {
   return (
@@ -8,6 +9,7 @@ export default function SharedRecipesPage() {
       breadcrumbs={[
         { name: "Shared with Me", href: "/shared-recipes", current: true },
       ]}
+      sidebarNavigation={recipeNavigation}
     >
       <SharedRecipesContent />
     </PageLayout>

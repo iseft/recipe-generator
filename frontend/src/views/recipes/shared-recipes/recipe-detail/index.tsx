@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import PageLayout from "../../../../shared/components/PageLayout";
 import SharedRecipeDetailContent from "./SharedRecipeDetailContent";
 import { useRecipe } from "../../shared/hooks/useRecipe";
+import { recipeNavigation } from "../../shared/navigation";
 
 export default function SharedRecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,7 +20,7 @@ export default function SharedRecipeDetailPage() {
     : [{ name: "Shared with Me", href: "/shared-recipes" }];
 
   return (
-    <PageLayout title="Recipe Details" breadcrumbs={breadcrumbs}>
+    <PageLayout title="Recipe Details" breadcrumbs={breadcrumbs} sidebarNavigation={recipeNavigation}>
       <SharedRecipeDetailContent
         recipe={recipe}
         isLoading={isLoading}
