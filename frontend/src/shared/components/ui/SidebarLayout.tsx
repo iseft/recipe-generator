@@ -103,7 +103,7 @@ export default function SidebarLayout({
 
       <div className="hidden lg:fixed lg:top-16 lg:bottom-0 lg:left-0 lg:right-0 lg:z-40 lg:flex lg:pointer-events-none">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pointer-events-none h-full">
-          <div className="w-72 h-full flex flex-col gap-y-5 overflow-y-auto bg-indigo-50 dark:bg-indigo-950 pointer-events-auto shadow-sm">
+          <div className="w-72 h-full flex flex-col gap-y-5 overflow-y-auto bg-indigo-50/50 dark:bg-indigo-950/50 pointer-events-auto shadow-sm">
             <nav className="flex flex-1 flex-col px-6 py-6">
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
                 <li>
