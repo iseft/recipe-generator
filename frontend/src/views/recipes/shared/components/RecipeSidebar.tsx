@@ -3,7 +3,7 @@ import {
   BookOpenIcon,
   ShareIcon,
 } from "@heroicons/react/24/outline";
-import SidebarLayout from "../../../../shared/components/SidebarLayout";
+import SidebarLayout from "../../../../shared/components/ui/SidebarLayout";
 
 interface RecipeSidebarProps {
   sidebarOpen: boolean;

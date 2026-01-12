@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import PageLayout from "../../../../shared/components/PageLayout";
+import PageLayout from "../../../../shared/components/ui/PageLayout";
 import MyRecipeDetailContent from "./MyRecipeDetailContent";
 import { useRecipe } from "../../shared/hooks/useRecipe";
 import { recipeNavigation } from "../../shared/navigation";

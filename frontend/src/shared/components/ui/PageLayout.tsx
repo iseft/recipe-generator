@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import Breadcrumbs from "./ui/Breadcrumbs";
+import Breadcrumbs from "./Breadcrumbs";
 import SidebarLayout from "./SidebarLayout";
 
 interface BreadcrumbItem {

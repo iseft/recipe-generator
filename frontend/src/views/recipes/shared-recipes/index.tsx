@@ -1,4 +1,4 @@
-import PageLayout from "../../../shared/components/PageLayout";
+import PageLayout from "../../../shared/components/ui/PageLayout";
 import SharedRecipesContent from "./components/SharedRecipesContent";
 import { recipeNavigation } from "../shared/navigation";
 

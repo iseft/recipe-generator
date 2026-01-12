@@ -6,7 +6,7 @@ import {
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { NavLink } from "react-router-dom";
-import { classNames } from "../utils/classNames";
+import { classNames } from "../../utils/classNames";
 
 interface SidebarItem {
   name: string;
