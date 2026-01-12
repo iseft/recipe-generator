@@ -9,7 +9,7 @@ use crate::recipes::application::{
 use crate::recipes::infrastructure::{OpenAiClient, PgRecipeRepository, PgRecipeShareRepository};
 use crate::shared::config::AppConfig;
 
-pub struct AppDependencies {
+pub struct RecipeDependencies {
     pub generate_use_case: Arc<GenerateRecipeUseCase<OpenAiClient>>,
     pub save_use_case: Arc<SaveRecipeUseCase<PgRecipeRepository>>,
     pub get_use_case: Arc<GetRecipeUseCase<PgRecipeRepository, PgRecipeShareRepository>>,
@@ -20,7 +20,7 @@ pub struct AppDependencies {
     pub delete_share_use_case: Arc<DeleteShareUseCase<PgRecipeRepository, PgRecipeShareRepository>>,
 }
 
-impl AppDependencies {
+impl RecipeDependencies {
     pub fn new(config: &AppConfig, db_pool: PgPool) -> Self {
         let llm_client = Arc::new(OpenAiClient::new(config.openai_api_key.clone()));
         let recipe_repository = Arc::new(PgRecipeRepository::new(db_pool.clone()));

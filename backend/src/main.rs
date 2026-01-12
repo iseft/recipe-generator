@@ -3,8 +3,7 @@ mod shared;
 
 use std::net::SocketAddr;
 
-use recipes::adapters::create_router;
-use shared::app::AppDependencies;
+use recipes::create_recipes_module;
 use shared::auth::init_clerk;
 use shared::config::AppConfig;
 use shared::db::create_pool;
@@ -23,19 +22,8 @@ async fn main() {
     init_clerk(config.clerk_secret_key.clone());
 
     let db_pool = create_pool(&config.database_url).await;
-    let dependencies = AppDependencies::new(&config, db_pool);
 
-    let app = create_router(
-        dependencies.generate_use_case,
-        dependencies.save_use_case,
-        dependencies.get_use_case,
-        dependencies.list_owned_use_case,
-        dependencies.list_shared_use_case,
-        dependencies.list_recipe_shares_use_case,
-        dependencies.create_share_use_case,
-        dependencies.delete_share_use_case,
-    );
-
+    let app = create_recipes_module(&config, db_pool);
     let app = apply_middleware(app, &config);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
