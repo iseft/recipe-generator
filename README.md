@@ -133,12 +133,6 @@ This script will:
 - Ask for confirmation before proceeding
 - Useful when migration versions conflict
 
-The container uses:
-- User: `recipe_user`
-- Password: `recipe_password`
-- Port: `5432`
-- Connection: `postgres://recipe_user:recipe_password@localhost:5432/recipe_generator`
-
 ### Run Tests
 
 Before running tests, ensure the test database exists and is reset:
@@ -149,8 +143,7 @@ Before running tests, ensure the test database exists and is reset:
 
 Then run tests:
 ```bash
-cd backend
-cargo test
+npm run test    # Run all tests
 ```
 
 ### Format & Lint Checks
@@ -168,7 +161,6 @@ cd frontend && npm run lint
 # Run all checks from root
 npm run format  # Format check
 npm run lint    # Lint check
-npm run test    # Run all tests
 ```
 
 ## API Endpoints
@@ -250,18 +242,6 @@ This application uses [Clerk](https://clerk.com) for authentication.
 
 The app uses Clerk's React components which handle authentication automatically. The backend verifies JWT tokens from the frontend using Clerk's JWT verification library.
 
-## AI Tools Usage
-
-This project was developed with the assistance of AI tools (specifically Cursor's AI coding assistant) to accelerate development and ensure best practices. AI was used for:
-
-- **Code generation**: Initial scaffolding of components, handlers, and database models
-- **Refactoring assistance**: Help with architectural decisions (DDD structure, Clean Architecture patterns)
-- **Error resolution**: Debugging compilation errors and type mismatches
-- **Documentation**: Generating README sections and code comments
-- **Code review**: Suggestions for improvements and consistency
-
-All AI-generated code was reviewed, tested, and integrated manually. The final codebase reflects deliberate architectural choices and follows Rust/TypeScript best practices.
-
 ## Security Considerations
 
 ### Authentication & Authorization
@@ -279,3 +259,15 @@ All AI-generated code was reviewed, tested, and integrated manually. The final c
 - **Error Handling**: Detailed error messages are logged server-side but generic messages are returned to clients
 - **Input Validation**: All API requests are validated using `validator` crate
 - **SQL Injection Prevention**: Using parameterized queries via `sqlx`
+
+## AI Tools Usage
+
+This project was developed with the assistance of AI tools (specifically Cursor's AI coding assistant) to accelerate development and ensure best practices. AI was used for:
+
+- **Code generation**: Initial scaffolding of components, handlers, and database models
+- **Refactoring assistance**: Help with architectural decisions (DDD structure, Clean Architecture patterns)
+- **Error resolution**: Debugging compilation errors and type mismatches
+- **Documentation**: Generating README sections and code comments
+- **Code review**: Suggestions for improvements and consistency
+
+All AI-generated code was reviewed, tested, and integrated manually.
