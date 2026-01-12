@@ -2,6 +2,8 @@
 
 A web application that generates recipes using AI based on ingredients you have on hand.
 
+> 🦀 **Note:** This is my very first time using Rust! The codebase may reflect learning patterns and could benefit from Rust best practices.
+
 ## Architecture
 
 This project uses **Domain-Driven Design (DDD)** with **Clean Architecture** principles, organized by feature modules:
@@ -196,27 +198,26 @@ The Swagger UI provides an interactive interface to explore all endpoints, view 
 See `.env.example` for a complete example file.
 
 ### Required
+
 | Variable | Description |
 |----------|-------------|
 | `OPENAI_API_KEY` | OpenAI API key |
-| `POSTGRES_USER` | PostgreSQL user |
-| `POSTGRES_PASSWORD` | PostgreSQL password |
-| `POSTGRES_DB` | PostgreSQL database name |
 | `CLERK_SECRET_KEY` | Clerk secret key (backend) |
 | `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key (frontend) |
 
-### Optional (with defaults)
+### Optional
+
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `DB_HOST` | Database host | localhost (local) / db (Docker) |
-| `DB_PORT` | Database port | 5432 |
-| `PORT` | Backend server port | 3000 |
-| `CORS_ORIGIN` | Allowed CORS origin | http://localhost:5173 (local) / http://localhost:8080 (Docker) |
-| `FRONTEND_PORT` | Frontend port (Docker) | 8080 |
-| `BACKEND_PORT` | Backend port (Docker) | 3000 |
-| `VITE_API_URL` | Frontend API URL (leave empty for nginx proxy) | "" |
-
-**Note:** `DATABASE_URL` is automatically constructed from `POSTGRES_*` vars. For Docker, set `DB_HOST=db` in docker-compose (already configured).
+| `POSTGRES_USER` | PostgreSQL user | `recipe_user` |
+| `POSTGRES_PASSWORD` | PostgreSQL password | `recipe_password` |
+| `POSTGRES_DB` | PostgreSQL database name | `recipe_generator` |
+| `DATABASE_URL` | Full database connection string | Constructed from `POSTGRES_*` vars |
+| `PORT` | Backend server port | `3000` |
+| `CORS_ORIGIN` | Allowed CORS origin | `http://localhost:5173` |
+| `DB_PORT` | Database port (Docker) | `5432` |
+| `BACKEND_PORT` | Backend port (Docker) | `3000` |
+| `FRONTEND_PORT` | Frontend port (Docker) | `8080` |
 
 ## Docker Services
 
