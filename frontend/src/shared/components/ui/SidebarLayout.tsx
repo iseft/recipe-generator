@@ -103,46 +103,46 @@ export default function SidebarLayout({
 
       <div className="hidden lg:fixed lg:top-16 lg:bottom-0 lg:left-0 lg:right-0 lg:z-40 lg:flex lg:pointer-events-none">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pointer-events-none h-full">
-          <div className="w-72 h-full flex flex-col gap-y-5 overflow-y-auto bg-indigo-50/50 dark:bg-indigo-950/50 pointer-events-auto shadow-sm">
+          <div className="w-72 h-full flex flex-col gap-y-5 overflow-y-auto bg-indigo-100 dark:bg-indigo-950 pointer-events-auto shadow-sm">
             <nav className="flex flex-1 flex-col px-6 py-6">
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
                 <li>
                   <ul role="list" className="space-y-1">
-                  {navigation.map((item) => (
-                    <li key={item.name}>
-                      <NavLink
-                        to={item.href}
-                        end={item.href === "/"}
-                        className={({ isActive }) =>
-                          classNames(
-                            isActive
-                              ? "bg-gray-50 text-indigo-600 dark:bg-white/5 dark:text-white"
-                              : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white",
-                            "group flex gap-x-3 rounded-md p-2 text-xs font-medium"
-                          )
-                        }
-                      >
-                        {({ isActive }) => (
-                          <>
-                            <item.icon
-                              aria-hidden="true"
-                              className={classNames(
-                                isActive
-                                  ? "text-indigo-600 dark:text-white"
-                                  : "text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-white",
-                                "size-6 shrink-0"
-                              )}
-                            />
-                            {item.name}
-                          </>
-                        )}
-                      </NavLink>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            </ul>
-          </nav>
+                    {navigation.map((item) => (
+                      <li key={item.name}>
+                        <NavLink
+                          to={item.href}
+                          end={item.href === "/"}
+                          className={({ isActive }) =>
+                            classNames(
+                              isActive
+                                ? "bg-gray-50 text-indigo-600 dark:bg-white/5 dark:text-white"
+                                : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white",
+                              "group flex gap-x-3 rounded-md p-2 text-xs font-medium"
+                            )
+                          }
+                        >
+                          {({ isActive }) => (
+                            <>
+                              <item.icon
+                                aria-hidden="true"
+                                className={classNames(
+                                  isActive
+                                    ? "text-indigo-600 dark:text-white"
+                                    : "text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-white",
+                                  "size-6 shrink-0"
+                                )}
+                              />
+                              {item.name}
+                            </>
+                          )}
+                        </NavLink>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
