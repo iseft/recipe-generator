@@ -70,7 +70,7 @@ export default function SidebarLayout({
                                 isActive
                                   ? "bg-gray-50 text-indigo-600 dark:bg-white/5 dark:text-white"
                                   : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white",
-                                "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
+                                "group flex gap-x-3 rounded-md p-2 text-xs font-medium"
                               )
                             }
                             onClick={() => setSidebarOpen(false)}
@@ -101,12 +101,13 @@ export default function SidebarLayout({
         </div>
       </Dialog>
 
-      <div className="hidden lg:fixed lg:top-16 lg:bottom-0 lg:z-40 lg:flex lg:w-72 lg:flex-col dark:bg-gray-900">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 py-6 dark:border-white/10 dark:bg-black/10">
-          <nav className="flex flex-1 flex-col">
-            <ul role="list" className="flex flex-1 flex-col gap-y-7">
-              <li>
-                <ul role="list" className="-mx-2 space-y-1">
+      <div className="hidden lg:fixed lg:top-16 lg:bottom-0 lg:left-0 lg:right-0 lg:z-40 lg:flex lg:pointer-events-none">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pointer-events-none h-full">
+          <div className="w-72 h-full flex flex-col gap-y-5 overflow-y-auto bg-indigo-50 dark:bg-indigo-950 pointer-events-auto shadow-sm">
+            <nav className="flex flex-1 flex-col px-6 py-6">
+              <ul role="list" className="flex flex-1 flex-col gap-y-7">
+                <li>
+                  <ul role="list" className="space-y-1">
                   {navigation.map((item) => (
                     <li key={item.name}>
                       <NavLink
@@ -117,7 +118,7 @@ export default function SidebarLayout({
                             isActive
                               ? "bg-gray-50 text-indigo-600 dark:bg-white/5 dark:text-white"
                               : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white",
-                            "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
+                            "group flex gap-x-3 rounded-md p-2 text-xs font-medium"
                           )
                         }
                       >
@@ -142,6 +143,7 @@ export default function SidebarLayout({
               </li>
             </ul>
           </nav>
+          </div>
         </div>
       </div>
     </>

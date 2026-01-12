@@ -38,9 +38,9 @@ export default function PageLayout({
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />
-        <header className="fixed top-16 left-0 right-0 z-40 bg-white shadow-sm dark:bg-gray-800 dark:shadow-none dark:after:pointer-events-none dark:after:absolute dark:after:inset-x-0 dark:after:inset-y-0 dark:after:border-y dark:after:border-white/10 lg:left-72">
+        <header className="fixed top-16 left-0 right-0 z-30 bg-white shadow-sm dark:bg-gray-800 dark:shadow-none dark:after:pointer-events-none dark:after:absolute dark:after:inset-x-0 dark:after:inset-y-0 dark:after:border-y dark:after:border-white/10">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 lg:ml-80">
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
@@ -62,9 +62,9 @@ export default function PageLayout({
             </div>
           </div>
         </header>
-        <main className="pt-32 lg:ml-72">
+        <main className="pt-32">
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            {children}
+            <div className="lg:ml-80">{children}</div>
           </div>
         </main>
       </>

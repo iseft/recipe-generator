@@ -3,14 +3,14 @@ import {
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon, CakeIcon } from "@heroicons/react/24/outline";
 import {
   SignedIn,
   SignedOut,
   SignInButton,
   UserButton,
 } from "@clerk/clerk-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { classNames } from "../utils/classNames";
 
 const navigation = [{ name: "Recipes", href: "/" }];
@@ -24,12 +24,10 @@ export default function Navigation() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <div className="shrink-0">
-              <img
-                alt="Your Company"
-                src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-                className="size-8"
-              />
+            <div className="shrink-0 pl-6">
+              <Link to="/" className="flex items-center">
+                <CakeIcon className="size-8 text-indigo-500" />
+              </Link>
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
