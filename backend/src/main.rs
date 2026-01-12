@@ -1,21 +1,18 @@
-mod adapters;
-mod application;
-mod domain;
-mod infrastructure;
+mod recipes;
+mod shared;
 
 use std::net::SocketAddr;
 use std::sync::Arc;
 
-use adapters::api::routes::create_router;
-use application::use_cases::{
+use recipes::adapters::create_router;
+use recipes::application::{
     CreateShareUseCase, DeleteShareUseCase, GenerateRecipeUseCase, GetRecipeUseCase,
     ListOwnedRecipesUseCase, ListSharedRecipesUseCase, SaveRecipeUseCase,
 };
-use infrastructure::auth::init_clerk;
-use infrastructure::config::AppConfig;
-use infrastructure::db::create_pool;
-use infrastructure::llm::OpenAiClient;
-use infrastructure::repositories::{PgRecipeRepository, PgRecipeShareRepository};
+use recipes::infrastructure::{OpenAiClient, PgRecipeRepository, PgRecipeShareRepository};
+use shared::auth::init_clerk;
+use shared::config::AppConfig;
+use shared::db::create_pool;
 use tower_http::cors::{Any, CorsLayer};
 
 #[tokio::main]

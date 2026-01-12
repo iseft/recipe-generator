@@ -1,27 +1,26 @@
 use std::sync::Arc;
 
 use axum::Router;
-use backend::adapters::api::routes::create_router;
-use backend::application::use_cases::{
+use backend::recipes::adapters::create_router;
+use backend::recipes::application::{
     CreateShareUseCase, DeleteShareUseCase, GenerateRecipeUseCase, GetRecipeUseCase,
     ListOwnedRecipesUseCase, ListSharedRecipesUseCase, SaveRecipeUseCase,
 };
-use backend::infrastructure::auth::init_clerk;
-use backend::infrastructure::db::create_pool;
-use backend::infrastructure::repositories::{PgRecipeRepository, PgRecipeShareRepository};
+use backend::recipes::infrastructure::{PgRecipeRepository, PgRecipeShareRepository};
+use backend::shared::auth::init_clerk;
+use backend::shared::db::create_pool;
 use tower::ServiceBuilder;
 use tower_http::cors::CorsLayer;
 
 pub struct MockLlmClient;
 
-impl backend::domain::services::LlmService for MockLlmClient {
+impl backend::recipes::domain::LlmService for MockLlmClient {
     async fn generate_recipe(
         &self,
         _ingredients: Vec<String>,
         _dietary_restrictions: Option<Vec<String>>,
-    ) -> Result<backend::domain::entities::GeneratedRecipe, backend::domain::services::LlmError>
-    {
-        Ok(backend::domain::entities::GeneratedRecipe {
+    ) -> Result<backend::recipes::domain::GeneratedRecipe, backend::recipes::domain::LlmError> {
+        Ok(backend::recipes::domain::GeneratedRecipe {
             title: "Mock Recipe".to_string(),
             ingredients: vec!["mock ingredient".to_string()],
             instructions: vec!["mock instruction".to_string()],
@@ -33,16 +32,15 @@ impl backend::domain::services::LlmService for MockLlmClient {
 }
 
 pub struct FailingLlmClient {
-    pub error: backend::domain::services::LlmError,
+    pub error: backend::recipes::domain::LlmError,
 }
 
-impl backend::domain::services::LlmService for FailingLlmClient {
+impl backend::recipes::domain::LlmService for FailingLlmClient {
     async fn generate_recipe(
         &self,
         _ingredients: Vec<String>,
         _dietary_restrictions: Option<Vec<String>>,
-    ) -> Result<backend::domain::entities::GeneratedRecipe, backend::domain::services::LlmError>
-    {
+    ) -> Result<backend::recipes::domain::GeneratedRecipe, backend::recipes::domain::LlmError> {
         Err(self.error.clone())
     }
 }
@@ -51,7 +49,7 @@ pub async fn create_test_app() -> Router {
     create_test_app_with_llm(Arc::new(MockLlmClient)).await
 }
 
-pub async fn create_test_app_with_llm<T: backend::domain::services::LlmService + 'static>(
+pub async fn create_test_app_with_llm<T: backend::recipes::domain::LlmService + 'static>(
     llm_client: Arc<T>,
 ) -> Router {
     init_clerk("sk_test_dummy_key_for_testing".to_string());
