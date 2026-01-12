@@ -34,7 +34,7 @@ Each feature module follows Clean Architecture layers, making it easy to add new
 
 ```bash
 # 1. Clone the repository
-git clone <repo-url>
+git clone https://github.com/iseft/recipe-generator
 cd recipe-generator
 
 # 2. Copy environment file and configure required keys
@@ -82,7 +82,7 @@ docker compose down -v
 
 1. Clone and configure:
 ```bash
-git clone <repo-url>
+git clone https://github.com/iseft/recipe-generator
 cd recipe-generator
 cp .env.example .env
 # Edit .env: set OPENAI_API_KEY, CLERK_SECRET_KEY, VITE_CLERK_PUBLISHABLE_KEY, and DATABASE_URL
@@ -139,9 +139,10 @@ The container uses:
 
 ### Run Tests
 
-Before running tests, ensure the test database exists:
+Before running tests, ensure the test database exists and is reset:
 ```bash
 ./create-local-db.sh  # Creates both main and test databases
+./reset-local-db.sh   # Reset databases to ensure clean state
 ```
 
 Then run tests:
