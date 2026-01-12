@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bars3Icon } from "@heroicons/react/24/outline";
+import { ChevronDoubleRightIcon } from "@heroicons/react/24/outline";
 import Breadcrumbs from "./Breadcrumbs";
 import SidebarLayout from "./SidebarLayout";
 
@@ -47,7 +47,7 @@ export default function PageLayout({
                 className="-m-2.5 p-2.5 text-gray-700 hover:text-gray-900 lg:hidden dark:text-gray-400 dark:hover:text-white"
               >
                 <span className="sr-only">Open sidebar</span>
-                <Bars3Icon aria-hidden="true" className="size-6" />
+                <ChevronDoubleRightIcon aria-hidden="true" className="size-6" />
               </button>
               <div className="flex-1">
                 {breadcrumbs && (
