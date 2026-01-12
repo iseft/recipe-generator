@@ -3,7 +3,6 @@ mod shared;
 
 use std::net::SocketAddr;
 
-use recipes::create_recipes_module;
 use shared::auth::init_clerk;
 use shared::config::AppConfig;
 use shared::db::create_pool;
@@ -23,7 +22,7 @@ async fn main() {
 
     let db_pool = create_pool(&config.database_url).await;
 
-    let app = create_recipes_module(&config, db_pool);
+    let app = recipes::create_router(&config, db_pool);
     let app = apply_middleware(app, &config);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));

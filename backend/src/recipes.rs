@@ -9,7 +9,7 @@ use sqlx::PgPool;
 
 use crate::shared::config::AppConfig;
 
-pub fn create_recipes_module(config: &AppConfig, db_pool: PgPool) -> Router {
+pub fn create_router(config: &AppConfig, db_pool: PgPool) -> Router {
     let dependencies = dependencies::RecipeDependencies::new(config, db_pool);
 
     adapters::create_router(
