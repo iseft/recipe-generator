@@ -63,4 +63,17 @@ impl RecipeShareRepository for PgRecipeShareRepository {
 
         Ok(result.map(|(exists,)| exists).unwrap_or(false))
     }
+
+    async fn find_by_recipe_id(
+        &self,
+        recipe_id: Uuid,
+    ) -> Result<Vec<RecipeShare>, RepositoryError> {
+        sqlx::query_as::<_, RecipeShare>(
+            "SELECT recipe_id, user_id, created_at FROM recipe_shares WHERE recipe_id = $1 ORDER BY created_at DESC",
+        )
+        .bind(recipe_id)
+        .fetch_all(&self.pool)
+        .await
+        .map_err(|e| RepositoryError::DatabaseError(e.to_string()))
+    }
 }

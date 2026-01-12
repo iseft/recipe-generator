@@ -51,4 +51,9 @@ pub trait RecipeShareRepository: Send + Sync {
         recipe_id: Uuid,
         user_id: &str,
     ) -> impl std::future::Future<Output = Result<bool, RepositoryError>> + Send;
+
+    fn find_by_recipe_id(
+        &self,
+        recipe_id: Uuid,
+    ) -> impl std::future::Future<Output = Result<Vec<RecipeShare>, RepositoryError>> + Send;
 }

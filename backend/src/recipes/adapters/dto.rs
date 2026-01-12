@@ -182,3 +182,19 @@ pub struct CreateShareRequest {
     #[schema(example = "friend@example.com")]
     pub email: String,
 }
+
+#[derive(Debug, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+#[schema(example = json!({
+    "userId": "user_123",
+    "email": "friend@example.com",
+    "createdAt": "2024-01-12T10:00:00Z"
+}))]
+pub struct ShareResponse {
+    #[schema(example = "user_123")]
+    pub user_id: String,
+    #[schema(example = "friend@example.com")]
+    pub email: String,
+    #[schema(example = "2024-01-12T10:00:00Z")]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+}

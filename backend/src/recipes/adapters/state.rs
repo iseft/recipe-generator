@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::recipes::application::{
     CreateShareUseCase, DeleteShareUseCase, GenerateRecipeUseCase, GetRecipeUseCase,
-    ListOwnedRecipesUseCase, ListSharedRecipesUseCase, SaveRecipeUseCase,
+    ListOwnedRecipesUseCase, ListRecipeSharesUseCase, ListSharedRecipesUseCase, SaveRecipeUseCase,
 };
 use crate::recipes::domain::{LlmService, RecipeRepository, RecipeShareRepository};
 
@@ -16,6 +16,7 @@ pub struct AppState<
     pub get_use_case: Arc<GetRecipeUseCase<R, S>>,
     pub list_owned_use_case: Arc<ListOwnedRecipesUseCase<R>>,
     pub list_shared_use_case: Arc<ListSharedRecipesUseCase<R>>,
+    pub list_recipe_shares_use_case: Arc<ListRecipeSharesUseCase<S>>,
     pub create_share_use_case: Arc<CreateShareUseCase<R, S>>,
     pub delete_share_use_case: Arc<DeleteShareUseCase<R, S>>,
 }
@@ -30,6 +31,7 @@ impl<T: LlmService + 'static, R: RecipeRepository + 'static, S: RecipeShareRepos
             get_use_case: Arc::clone(&self.get_use_case),
             list_owned_use_case: Arc::clone(&self.list_owned_use_case),
             list_shared_use_case: Arc::clone(&self.list_shared_use_case),
+            list_recipe_shares_use_case: Arc::clone(&self.list_recipe_shares_use_case),
             create_share_use_case: Arc::clone(&self.create_share_use_case),
             delete_share_use_case: Arc::clone(&self.delete_share_use_case),
         }

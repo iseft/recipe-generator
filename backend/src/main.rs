@@ -7,7 +7,7 @@ use std::sync::Arc;
 use recipes::adapters::create_router;
 use recipes::application::{
     CreateShareUseCase, DeleteShareUseCase, GenerateRecipeUseCase, GetRecipeUseCase,
-    ListOwnedRecipesUseCase, ListSharedRecipesUseCase, SaveRecipeUseCase,
+    ListOwnedRecipesUseCase, ListRecipeSharesUseCase, ListSharedRecipesUseCase, SaveRecipeUseCase,
 };
 use recipes::infrastructure::{OpenAiClient, PgRecipeRepository, PgRecipeShareRepository};
 use shared::auth::init_clerk;
@@ -39,6 +39,8 @@ async fn main() {
     ));
     let list_owned_use_case = Arc::new(ListOwnedRecipesUseCase::new(recipe_repository.clone()));
     let list_shared_use_case = Arc::new(ListSharedRecipesUseCase::new(recipe_repository.clone()));
+    let list_recipe_shares_use_case =
+        Arc::new(ListRecipeSharesUseCase::new(share_repository.clone()));
     let create_share_use_case = Arc::new(CreateShareUseCase::new(
         recipe_repository.clone(),
         share_repository.clone(),
@@ -62,6 +64,7 @@ async fn main() {
         get_use_case,
         list_owned_use_case,
         list_shared_use_case,
+        list_recipe_shares_use_case,
         create_share_use_case,
         delete_share_use_case,
     )

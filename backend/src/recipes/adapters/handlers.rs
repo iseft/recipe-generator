@@ -14,7 +14,7 @@ use crate::shared::auth::AuthenticatedUser;
 
 use super::dto::{
     CreateShareRequest, GenerateRecipeRequest, GeneratedRecipeResponse, RecipeResponse,
-    SaveRecipeRequest,
+    SaveRecipeRequest, ShareResponse,
 };
 use super::extractors::ValidatedJson;
 use super::state::AppState;
@@ -319,4 +319,64 @@ pub async fn delete_share<T: LlmService, R: RecipeRepository, S: RecipeShareRepo
         .map_err(map_repo_error)?;
 
     Ok(StatusCode::NO_CONTENT)
+}
+
+#[utoipa::path(
+    get,
+    path = "/api/recipes/{id}/shares",
+    summary = "List users a recipe is shared with",
+    description = "Returns a list of users (with emails) that the recipe is shared with. Only the recipe owner can view this list.",
+    params(
+        ("id" = Uuid, Path, description = "Recipe UUID")
+    ),
+    responses(
+        (status = 200, description = "List of users the recipe is shared with", body = [ShareResponse]),
+        (status = 401, description = "Unauthorized - authentication token missing or invalid"),
+        (status = 403, description = "Access denied - user is not the owner of this recipe", body = ErrorResponse),
+        (status = 404, description = "Recipe not found", body = ErrorResponse),
+        (status = 500, description = "Database error", body = ErrorResponse),
+    ),
+    security(
+        ("bearer_auth" = [])
+    ),
+    tag = "Sharing"
+)]
+pub async fn list_recipe_shares<T: LlmService, R: RecipeRepository, S: RecipeShareRepository>(
+    State(state): State<AppState<T, R, S>>,
+    user: AuthenticatedUser,
+    Path(recipe_id): Path<Uuid>,
+) -> Result<Json<Vec<ShareResponse>>, (StatusCode, Json<ErrorResponse>)> {
+    let recipe = state
+        .get_use_case
+        .execute(recipe_id, &user.user_id)
+        .await
+        .map_err(map_repo_error)?;
+
+    if recipe.owner_id != user.user_id {
+        return Err((
+            StatusCode::FORBIDDEN,
+            Json(ErrorResponse {
+                error: "Access denied".to_string(),
+            }),
+        ));
+    }
+
+    let shares = state
+        .list_recipe_shares_use_case
+        .execute(recipe_id)
+        .await
+        .map_err(map_repo_error)?;
+
+    let mut responses: Vec<ShareResponse> = Vec::new();
+    for share in shares {
+        if let Ok(Some(email)) = crate::shared::auth::get_user_email_by_id(&share.user_id).await {
+            responses.push(ShareResponse {
+                user_id: share.user_id,
+                email,
+                created_at: share.created_at,
+            });
+        }
+    }
+
+    Ok(Json(responses))
 }

@@ -2,7 +2,7 @@ use utoipa::OpenApi;
 
 use super::dto::{
     CreateShareRequest, GenerateRecipeRequest, GeneratedRecipeResponse, RecipeResponse,
-    SaveRecipeRequest,
+    SaveRecipeRequest, ShareResponse,
 };
 use super::handlers::ErrorResponse;
 
@@ -14,6 +14,7 @@ use super::handlers::ErrorResponse;
         crate::recipes::adapters::handlers::get_recipe,
         crate::recipes::adapters::handlers::list_my_recipes,
         crate::recipes::adapters::handlers::list_shared_recipes,
+        crate::recipes::adapters::handlers::list_recipe_shares,
         crate::recipes::adapters::handlers::create_share,
         crate::recipes::adapters::handlers::delete_share,
     ),
@@ -23,6 +24,7 @@ use super::handlers::ErrorResponse;
         SaveRecipeRequest,
         RecipeResponse,
         CreateShareRequest,
+        ShareResponse,
         ErrorResponse,
     )),
     tags(
