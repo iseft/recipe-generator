@@ -1,5 +1,5 @@
 import { useSharedRecipes } from "../hooks/useSharedRecipes";
-import RecipeCard from "../../../../shared/components/recipe/RecipeCard";
+import RecipeCard from "../../shared/components/RecipeCard";
 import LoadingState from "../../../../shared/components/ui/LoadingState";
 import ErrorState from "../../../../shared/components/ui/ErrorState";
 

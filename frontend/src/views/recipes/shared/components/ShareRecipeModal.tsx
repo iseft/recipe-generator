@@ -1,9 +1,9 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useShareRecipe } from "../../hooks/useShareRecipe";
-import Input from "../ui/Input";
-import PrimaryButton from "../ui/PrimaryButton";
+import { useShareRecipe } from "../../../../shared/hooks/useShareRecipe";
+import Input from "../../../../shared/components/ui/Input";
+import PrimaryButton from "../../../../shared/components/ui/PrimaryButton";
 
 const shareRecipeFormSchema = z.object({
   email: z.email("Please enter a valid email address"),

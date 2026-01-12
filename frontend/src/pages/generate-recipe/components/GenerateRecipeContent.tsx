@@ -2,9 +2,9 @@ import { SignedIn } from "@clerk/clerk-react";
 import { useGenerateRecipe } from "../hooks/useGenerateRecipe";
 import { useSaveRecipe } from "../hooks/useSaveRecipe";
 import IngredientInput from "./IngredientInput";
-import RecipeCard from "../../shared/components/RecipeCard";
-import PrimaryButton from "../../../../shared/components/ui/PrimaryButton";
-import LoadingState from "../../../../shared/components/ui/LoadingState";
+import RecipeCard from "../../../views/recipes/shared/components/RecipeCard";
+import PrimaryButton from "../../../shared/components/ui/PrimaryButton";
+import LoadingState from "../../../shared/components/ui/LoadingState";
 import type { GenerateRecipeRequest } from "../types";
 
 export default function GenerateRecipeContent() {
