@@ -22,6 +22,29 @@ backend/src/
 
 Each feature module follows Clean Architecture layers, making it easy to add new features (e.g., `users/`, `notifications/`) alongside `recipes/`.
 
+### System Architecture
+
+```
+┌─────────────┐
+│   Frontend  │  React + TypeScript
+└──────┬──────┘
+       │ HTTP/REST API
+       │ (with JWT auth)
+       ▼
+┌─────────────┐
+│   Backend   │  Rust + Axum
+└──────┬──────┘
+       │
+       ├──────────────┬──────────────┐
+       │              │              │
+       ▼              ▼              ▼
+┌──────────┐  ┌──────────┐  ┌──────────┐
+│Database  │  │   LLM    │  │  Clerk   │
+│PostgreSQL│  │  OpenAI  │  │   Auth   │
+│          │  │Chat API  │  │   JWT    │
+└──────────┘  └──────────┘  └──────────┘
+```
+
 ## Tech Stack
 
 - **Backend:** Rust, Axum, SQLx
