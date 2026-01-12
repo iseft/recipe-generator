@@ -28,34 +28,47 @@ Each feature module follows Clean Architecture layers, making it easy to add new
 - **LLM:** OpenAI API (gpt-4o-mini)
 - **Containerization:** Docker, Docker Compose
 
-## Quick Start (Docker)
+## Quick Start (Docker Compose)
 
-The fastest way to run the entire application:
+**Fastest way to run the application** - Everything runs in containers, no local setup needed.
 
 ```bash
-# 1. Copy environment file and add your OpenAI API key
-cp .env.example .env
-# Edit .env and set OPENAI_API_KEY=sk-your-key
+# 1. Clone the repository
+git clone <repo-url>
+cd recipe-generator
 
-# 2. Start all services
+# 2. Copy environment file and configure required keys
+cp .env.example .env
+# Edit .env and set:
+#   - OPENAI_API_KEY=sk-your-openai-key
+#   - CLERK_SECRET_KEY=sk_test_your-clerk-secret-key
+#   - VITE_CLERK_PUBLISHABLE_KEY=pk_test_your-clerk-publishable-key
+
+# 3. Start all services (frontend, backend, database)
 docker compose up --build
 
-# 3. Access the application
+# 4. Access the application
 # Frontend: http://localhost:8080
 # Backend API: http://localhost:3000
+# Swagger UI: http://localhost:3000/swagger-ui
 ```
 
-To stop:
+**Getting your keys:**
+- **OpenAI API Key**: Get from [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+- **Clerk Keys**: Sign up at [clerk.com](https://clerk.com), create an application, then go to **Configure** → **API Keys** in the dashboard
+
+**Docker commands:**
 ```bash
+# Stop services
 docker compose down
-```
 
-To stop and remove data:
-```bash
+# Stop and remove all data
 docker compose down -v
 ```
 
 ## Local Development
+
+**For active development** - Run services locally with hot reload, better debugging, and faster iteration.
 
 ### Prerequisites
 
@@ -63,6 +76,38 @@ docker compose down -v
 - Node.js 20+ (use `nvm use`)
 - PostgreSQL 16+ (or use Docker - see below)
 - OpenAI API key
+- Clerk account and API keys (for authentication)
+
+### Setup
+
+1. Clone and configure:
+```bash
+git clone <repo-url>
+cd recipe-generator
+cp .env.example .env
+# Edit .env: set OPENAI_API_KEY, CLERK_SECRET_KEY, VITE_CLERK_PUBLISHABLE_KEY, and DATABASE_URL
+```
+
+2. Install dependencies:
+```bash
+npm install
+cd frontend && npm install && cd ..
+```
+
+3. Run development servers:
+```bash
+npm run dev
+```
+
+- Backend: `http://localhost:3000`
+- Frontend: `http://localhost:5173`
+
+### Run Separately
+
+```bash
+npm run dev:backend   # Backend only
+npm run dev:frontend  # Frontend only
+```
 
 ### Local Database Setup
 
@@ -91,37 +136,6 @@ The container uses:
 - Password: `recipe_password`
 - Port: `5432`
 - Connection: `postgres://recipe_user:recipe_password@localhost:5432/recipe_generator`
-
-### Setup
-
-1. Clone and configure:
-```bash
-git clone <repo-url>
-cd recipe-generator
-cp .env.example .env
-# Edit .env: set OPENAI_API_KEY and DATABASE_URL
-```
-
-2. Install dependencies:
-```bash
-npm install
-cd frontend && npm install && cd ..
-```
-
-3. Run development servers:
-```bash
-npm run dev
-```
-
-- Backend: `http://localhost:3000`
-- Frontend: `http://localhost:5173`
-
-### Run Separately
-
-```bash
-npm run dev:backend   # Backend only
-npm run dev:frontend  # Frontend only
-```
 
 ### Run Tests
 
@@ -176,55 +190,19 @@ Interactive API documentation is available at:
 
 The Swagger UI provides an interactive interface to explore all endpoints, view request/response schemas, and test API calls directly from the browser.
 
-### Generate Recipe
-
-```bash
-curl -X POST http://localhost:3000/api/recipes/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "ingredients": ["chicken", "rice", "garlic"],
-    "dietaryRestrictions": ["gluten-free"]
-  }'
-```
-
-### Save Recipe
-
-```bash
-curl -X POST http://localhost:3000/api/recipes \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Garlic Chicken and Rice",
-    "ingredients": ["2 cups chicken breast", "1 cup rice"],
-    "instructions": ["Step 1...", "Step 2..."],
-    "prepTimeMinutes": 10,
-    "cookTimeMinutes": 20,
-    "servings": 4
-  }'
-```
-
-### List Recipes
-
-```bash
-curl http://localhost:3000/api/recipes
-```
-
-### Get Recipe by ID
-
-```bash
-curl http://localhost:3000/api/recipes/<uuid>
-```
-
 ## Environment Variables
 
+See `.env.example` for a complete example file.
+
 ### Required
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `OPENAI_API_KEY` | OpenAI API key | Yes |
-| `POSTGRES_USER` | PostgreSQL user | Yes |
-| `POSTGRES_PASSWORD` | PostgreSQL password | Yes |
-| `POSTGRES_DB` | PostgreSQL database name | Yes |
-| `CLERK_SECRET_KEY` | Clerk secret key (backend) | Yes |
-| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key (frontend) | Yes |
+| Variable | Description |
+|----------|-------------|
+| `OPENAI_API_KEY` | OpenAI API key |
+| `POSTGRES_USER` | PostgreSQL user |
+| `POSTGRES_PASSWORD` | PostgreSQL password |
+| `POSTGRES_DB` | PostgreSQL database name |
+| `CLERK_SECRET_KEY` | Clerk secret key (backend) |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key (frontend) |
 
 ### Optional (with defaults)
 | Variable | Description | Default |
@@ -269,28 +247,6 @@ This application uses [Clerk](https://clerk.com) for authentication.
 ### How It Works
 
 The app uses Clerk's React components which handle authentication automatically. The backend verifies JWT tokens from the frontend using Clerk's JWT verification library.
-
-### Example .env File
-
-```bash
-# OpenAI
-OPENAI_API_KEY=sk-your-openai-key
-
-# Database
-POSTGRES_USER=recipe_user
-POSTGRES_PASSWORD=recipe_password
-POSTGRES_DB=recipe_generator
-DB_HOST=localhost
-DB_PORT=5432
-
-# Clerk Authentication
-CLERK_SECRET_KEY=sk_test_your-clerk-secret-key
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_your-clerk-publishable-key
-
-# Server
-PORT=3000
-CORS_ORIGIN=http://localhost:5173
-```
 
 ## AI Tools Usage
 
